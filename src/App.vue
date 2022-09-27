@@ -16,8 +16,6 @@ export default {
     window.addEventListener("beforeunload",()=>{
       sessionStorage.setItem("store",JSON.stringify(this.$store.state))
     })
-
-    console.log("进入管理系统")
   },
 }
 </script>
