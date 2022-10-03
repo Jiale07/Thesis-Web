@@ -1,9 +1,10 @@
 <template>
   <div>
-    <div class="myContainer myHeader">
-      <el-page-header @back="goBack" content="开题报告提交页面——页面设置">
-      </el-page-header>
-    </div>
+    <setting-view-header
+      :header-title="`开题报告提交页面——页面设置`"
+      @on-click-back="goBack"
+    >
+    </setting-view-header>
     <div class="myContainer">
       <div>
         <addThesisInputSetting
@@ -11,47 +12,37 @@
           :getThesisInputSettingList="getThesisInputSettingList"
         ></addThesisInputSetting>
       </div>
-      <el-table
-          :data="tableData"
-          v-loading="loading"
-          style="width: 100%"
-          :empty-text="inputEmpty">
-        <el-table-column
-            label="序号"
-            prop="serialNumber"
-            width="50px">
-        </el-table-column>
-        <el-table-column
-            label="输入框标题"
-            prop="titleName"
-            width="420px">
-        </el-table-column>
-        <el-table-column>
-          <template slot-scope="scope">
-            <div class="buttonBox">
-              <updateThesisInputSetting
-                  :row="scope.row"
-                  :getThesisInputSettingList="getThesisInputSettingList"
-              ></updateThesisInputSetting>
-              <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.row.id)">删除</el-button>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="table-box">
+        <setting-table
+          :tableData="tableData"
+          :tableColumn="tableColumn"
+          @on-click-delete="handleDelete"
+        >
+        </setting-table>
+      </div>
     </div>
+    <setting-create-dialog
+      v-if="showSettingCreateDialog"
+      :title="'添加自定义输入项标题'"
+      :sourceForm="dialogSourceForm"
+      :dialogFormItems="dialogFormItems"
+      @on-submit="addThesisInputSettingItem"
+      @on-click-close="closeCreateDialog"
+    >
+    </setting-create-dialog>
   </div>
 </template>
 
 <script>
-import updateThesisInputSetting from './components/updateThesisInputSetting'
 import addThesisInputSetting from './components/addThesisInputSetting'
 import {
   deletedThesisInputSetting,
-  getThesisInputSettingList
+  getThesisInputSettingList, updateThesisInputSetting
 } from "../../../../axios/adminView/WebViewSetting/ThesisSettingView";
+import SettingViewHeader from "../../../../components/backStage/settingView/public/settingViewHeader";
+import SettingTable from '../../../../components/backStage/settingTable/index'
+import SettingCreateDialog from '../../../../components/backStage/settingCreateDialog'
+
 export default {
   name: "ThesisSettingView",
   data(){
@@ -60,12 +51,80 @@ export default {
       tableData:[],
       loading:false,
 
-      tableDataLength:0
+      tableDataLength:0,
+
+      showSettingCreateDialog: false,
+
+      dialogFormItems: [
+        {
+          prop: 'serialNumber',
+          label: '序号',
+          type: 'Number',
+          min: 1,
+          max: 99,
+        },
+        {
+          prop: 'titleName',
+          label: '输入框标题',
+          type: 'String',
+        }
+      ],
+      dialogSourceForm: {
+        id: 0,
+        serialNumber: 0,
+        titleName: '',
+      }
     }
   },
   components:{
-    updateThesisInputSetting,
-    addThesisInputSetting
+    addThesisInputSetting,
+    SettingViewHeader,
+    SettingTable,
+    SettingCreateDialog,
+  },
+  computed: {
+    tableColumn() {
+      return [
+        {
+          prop: 'serialNumber',
+          label: '序号',
+          minWidth: 50,
+          width: 50,
+          align: 'center',
+          headerAlign: 'center'
+        },
+        {
+          prop: 'titleName',
+          label: '输入框标题',
+          minWidth: 120,
+          width: 120,
+          align: 'left',
+          headerAlign: 'center'
+        },
+        {
+          prop: 'operation',
+          label: '操作',
+          align: 'center',
+          className: 'display-flex justify-end',
+          children: [
+            {
+              prop: 'update',
+              label: '更改',
+              type: 'warning',
+              size: 'mini',
+              clickFunction: this.showCreateDialog,
+            },
+            {
+              prop: 'delete',
+              label: '删除',
+              type: 'danger',
+              size: 'mini',
+              clickFunction: this.handleDelete,
+            }
+          ]
+        }
+      ]
+    }
   },
   methods:{
     goBack(){
@@ -84,8 +143,8 @@ export default {
       })
     },
 
-    handleDelete(GDTISId){
-      deletedThesisInputSetting({GDTISId}).then(result=>{
+    handleDelete(row){
+      deletedThesisInputSetting({id: row.id}).then(result=>{
         let res = result.data
         if (res.resultCode===200){
           this.$message({
@@ -100,6 +159,43 @@ export default {
           })
         }
       })
+    },
+
+
+    addThesisInputSettingItem(form) {
+      let GDTISObject = {
+        id: form.id,
+        serialNumber:form.serialNumber,
+        titleName:form.titleName
+      }
+      updateThesisInputSetting(GDTISObject).then(result=>{
+        let res = result.data
+        if (res.resultCode===200){
+          this.$message({
+            type:'success',
+            message:res.message
+          })
+          this.dialogFormVisible = false
+          this.getThesisInputSettingList()
+          this.closeCreateDialog()
+        }else{
+          this.$message({
+            type:'error',
+            message:res.message
+          })
+        }
+      })
+    },
+
+    closeCreateDialog() {
+      this.showSettingCreateDialog = false
+    },
+
+    showCreateDialog(row) {
+      this.dialogSourceForm.id = row.id
+      this.dialogSourceForm.serialNumber = row.serialNumber
+      this.dialogSourceForm.titleName = row.titleName
+      this.showSettingCreateDialog = true
     }
   },
 
@@ -115,13 +211,6 @@ export default {
   margin-bottom: 10px;
   border-radius: 10px;
   background-color: #ffffff;
-
-
-  .buttonBox{
-    width: 120px;
-    display: flex;
-    justify-content: space-between;
-  }
 
 }
 </style>

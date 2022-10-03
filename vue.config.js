@@ -1,24 +1,21 @@
 const path = require("path")
-function resolve(dir){
-    return path.join(__dirname,dir);
+
+function resolve(dir) {
+    return path.join(__dirname, dir);
 }
 
 
 module.exports = {
     devServer: {
         // open: process.platform === 'darwin',
-        host: 'localhost',
-        port: 3000,
-        proxy: {
+        host: 'localhost', port: 3000, proxy: {
             '/thesisApi': {
-                target: `http://localhost:8080`,
-                pathRewrite:{'^/thesisApi':''},
+                target: `http://localhost:8080`, pathRewrite: {'^/thesisApi': ''},
             }
-        },
-        disableHostCheck: true
+        }, disableHostCheck: true
     },
-    chainWebpack:config=>{
+    chainWebpack: config => {
         config.resolve.alias
-            .set("@",resolve("src"))
+            .set("@", resolve("src"))
     }
 }

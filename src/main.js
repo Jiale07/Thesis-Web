@@ -14,6 +14,10 @@ Vue.use(VueQuillEditor)
 Vue.use(ElementUI);
 Vue.config.productionTip = false
 
+Vue.prototype.$isEmpty = function(value) {
+  return value === '' || value === null || value === undefined
+}
+
 new Vue({
   router,
   store,
