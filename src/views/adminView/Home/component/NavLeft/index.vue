@@ -139,6 +139,17 @@ export default {
               path:'/admin/thesisSettingView',
             }
           ]
+        },{
+          id: '6',
+          text: '审批流设置',
+          icon: 'el-icon-setting',
+          childrenList: [
+            {
+              id: '6-1',
+              text: '开题报告审批流程设置',
+              path: '/admin/approvalProcessSetting'
+            }
+          ]
         }
       ]
     }

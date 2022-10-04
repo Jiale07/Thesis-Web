@@ -6,108 +6,49 @@
     </div>
 
     <div class="myContainer">
-      <div class="titleBox">
+      <div class="audit-table title-box">
         <h4>开题报告主要内容设置：</h4>
         <div>
-          <addThesisProposalInputSetting
-            :getTPISList="getTPISList"
-          ></addThesisProposalInputSetting>
+          <el-button type="primary" @click="showCreateDialog">添加</el-button>
         </div>
       </div>
-      <el-table
-          :data="tableData"
-          v-loading="loading"
-          style="width: 100%"
-          :empty-text="inputEmpty">
-        <el-table-column
-            label="序号"
-            prop="serialNumber"
-            width="50px">
-        </el-table-column>
-        <el-table-column
-            label="输入框标题"
-            prop="titleName"
-            width="420px">
-        </el-table-column>
-        <el-table-column>
-          <template slot-scope="scope">
-            <div class="buttonBox">
-              <updateThesisProposalInputSetting
-                  :row="scope.row"
-                  :getTPISList="getTPISList"
-              ></updateThesisProposalInputSetting>
-              <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.row)">删除</el-button>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-
+      <setting-table
+          :tableData="tableData"
+          :tableColumn="tableColumn"
+          @on-click-delete="handleDelete"
+      >
+      </setting-table>
     </div>
-
-    <div class="myContainer">
-      <div class="titleBox">
-        <h4>开题报告审核输入设置：</h4>
-        <div>
-          <addTPAISetting
-            :postTPAuditInputSettingList="postTPAuditInputSettingList"
-          ></addTPAISetting>
-        </div>
-      </div>
-      <div>
-        <el-table
-            :data="AISTableData"
-            v-loading="loading"
-            style="width: 100%"
-            :empty-text="auditInputEmpty">
-          <el-table-column
-              label="序号"
-              prop="serialNumber"
-              width="50px">
-          </el-table-column>
-          <el-table-column
-              label="输入框标题"
-              prop="titleName"
-              width="300px">
-          </el-table-column>
-          <el-table-column
-              label="可填写角色"
-              prop="roleName"
-              width="300px">
-          </el-table-column>
-          <el-table-column>
-            <template slot-scope="scope">
-              <div class="buttonBox">
-                <updateTPAISetting
-                    :row="scope.row"
-                    :postTPAuditInputSettingList="postTPAuditInputSettingList"
-                ></updateTPAISetting>
-                <el-button
-                    size="mini"
-                    type="danger"
-                    @click="TPAIHandleDelete(scope.row)">删除</el-button>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-    </div>
+    <setting-create-dialog
+        v-if="showSettingCreateDialog"
+        :title="'添加自定义输入项标题'"
+        :dialogFormItems="dialogFormItems"
+        @on-submit="addThesisProposalInputSettingItem"
+        @on-click-close="closeCreateDialog"
+    >
+    </setting-create-dialog>
+    <setting-create-dialog
+      v-if="showSettingUpdateDialog"
+      :title="'更改自定义输入项标题'"
+      :sourceForm="dialogSourceForm"
+      :dialogFormItems="dialogFormItems"
+      @on-submit="updateThesisProposalItem"
+      @on-click-close="closeUpdateDialog"
+    >
+    </setting-create-dialog>
   </div>
 </template>
 
 <script>
 import {
-  getTPISList, postDeletedTPAuditInputSetting,
+  getTPISList, postAddTPIS,
   postDeletedTPIS,
-  postTPAuditInputSettingList
+  postTPAuditInputSettingList,
+  postUpdateTPIS
+
 } from "../../../../axios/adminView/WebViewSetting/ThesisProposalSettingView";
-import addThesisProposalInputSetting from './components/addThesisProposalInputSetting'
-import updateThesisProposalInputSetting from './components/updateThesisProposalInputSetting'
-import addTPAISetting from './components/addThesisProposalAuditInputSetting'
-import updateTPAISetting from './components/updateThesisProposalAuditInputSetting'
-import {getRoleList} from "../../../../axios/public/RoleAbout";
+import SettingTable from '../../../../components/backStage/settingTable/index'
+import SettingCreateDialog from '../../../../components/backStage/settingCreateDialog'
 import {mapState} from "vuex";
 
 export default {
@@ -134,16 +75,138 @@ export default {
 
       inputEmpty:'暂无数据',
       auditInputEmpty:'暂无数据',
+
+      showSettingCreateDialog: false,
+      showSettingUpdateDialog: false,
+
+      dialogSourceForm: {
+        id: 0,
+        serialNumber: 0,
+        titleName: '',
+      },
+
+      dialogFormItems: [
+        {
+          prop: 'serialNumber',
+          label: '序号',
+          type: 'Number',
+          min: 1,
+          max: 99,
+        },
+        {
+          prop: 'titleName',
+          label: '输入框标题',
+          type: 'String',
+        }
+      ],
     }
   },
   computed:{
-    ...mapState('thesisProposalViewSetting',['roleOptions'])
+    ...mapState('thesisProposalViewSetting',['roleOptions']),
+
+    tableColumn() {
+      return [
+        {
+          prop: 'serialNumber',
+          label: '序号',
+          minWidth: 50,
+          width: 50,
+          align: 'center',
+          headerAlign: 'headerAlign',
+        },
+        {
+          prop: 'titleName',
+          label: '输入框标题',
+          minWidth: 240,
+          width: 240,
+          align: 'left',
+          headerAlign: 'center',
+        },
+        {
+          prop: 'operation',
+          label: '操作',
+          align: 'center',
+          className: 'display-flex justify-end',
+          children: [
+            {
+              prop: 'update',
+              label: '更改',
+              type: 'warning',
+              size: 'mini',
+              clickFunction: this.showUpdateDialog
+            },
+            {
+              prop: 'delete',
+              label: '删除',
+              type: 'danger',
+              size: 'mini',
+              clickFunction: this.handleDelete
+            }
+          ],
+        }
+      ]
+    },
+
+    auditSettingTableColumn() {
+      return [
+        {
+          prop: 'serialNumber',
+          label: '序号',
+          minWidth: 50,
+          width: 50,
+          align: 'center',
+          headerAlign: 'center'
+        },
+        {
+          prop: 'titleName',
+          label: '输入框标题',
+          minWidth: 240,
+          width: 240,
+          align: 'center',
+          headerAlign: 'center'
+        },
+        {
+          prop: 'roleId',
+          label: '可填写角色',
+          minWidth: 240,
+          width: 240,
+          align: 'center',
+          headerAlign: 'center'
+        },
+        {
+          prop: 'operation',
+          label: '操作',
+          align: 'center',
+          headerAlign: 'center',
+          className: 'display-flex justify-end',
+          children: [
+            {
+              prop: 'update',
+              label: '更改',
+              type: 'warning',
+              size: 'mini',
+
+            },
+            {
+              prop: 'delete',
+              label: '删除',
+              type: 'danger',
+              size: 'mini',
+
+            }
+          ]
+        },
+      ]
+    }
   },
   components:{
-    addThesisProposalInputSetting,
-    updateThesisProposalInputSetting,
-    addTPAISetting,
-    updateTPAISetting,
+    // addThesisProposalInputSetting,
+    // addTPAISetting,
+    // updateTPAISetting,
+
+    // SettingCreateDialog,
+    SettingTable,
+    SettingCreateDialog,
   },
   methods:{
     goBack(){
@@ -158,9 +221,6 @@ export default {
 
     },
 
-    handleEdit(){
-
-    },
     handleDelete(row){
       postDeletedTPIS({
         thesisProposalInputSettingId:row.id
@@ -181,28 +241,6 @@ export default {
         }
       })
     },
-
-    TPAIHandleDelete(row){
-      postDeletedTPAuditInputSetting({
-        TPAISId:row.id
-      }).then(result=>{
-        let res = result.data
-        if (res.resultCode===200){
-          this.$message({
-            type:'success',
-            message:res.message,
-          })
-          this.dialogFormVisible = false
-          this.postTPAuditInputSettingList()
-        }else{
-          this.$message({
-            type:'error',
-            message:res.message,
-          })
-        }
-      })
-    },
-
 
     getTPISList(){
       getTPISList().then(result=>{
@@ -235,19 +273,88 @@ export default {
       })
     },
 
-    getRoleList(){
-      getRoleList().then(result=>{
+    showUpdateDialog(row) {
+      let {id, serialNumber, titleName} = row
+      this.dialogSourceForm = {
+        id,
+        serialNumber,
+        titleName,
+      }
+      this.showSettingUpdateDialog = true
+    },
+
+    updateThesisProposalItem(submitFrom) {
+      let params = {
+        id: submitFrom.id,
+        serialNumber: submitFrom.serialNumber,
+        titleName: submitFrom.titleName,
+      }
+      console.log('params', params)
+      postUpdateTPIS(params).then(result=>{
         let res = result.data
-        if (res.resultCode===200){
-          this.$store.commit("thesisProposalViewSetting/setRoleOptions", res.data)
+        if (res.resultCode){
+          this.$message({
+            type:'success',
+            message:res.message
+          })
+          this.closeUpdateDialog()
+          this.refreshData()
+        }else{
+          this.$message({
+            type:'success',
+            message:res.message
+          })
         }
       })
-    }
+    },
+
+    closeUpdateDialog() {
+      this.showSettingUpdateDialog = false
+    },
+
+    closeCreateDialog() {
+      this.showSettingCreateDialog = false
+    },
+
+    refreshData() {
+      this.getTPISList()
+    },
+
+    initData() {
+      this.getTPISList()
+    },
+
+
+    addThesisProposalInputSettingItem(submitForm) {
+      let params = {
+        serialNumber: submitForm.serialNumber,
+        titleName: submitForm.titleName,
+      }
+      postAddTPIS(params).then(result=>{
+        let res = result.data
+        if (res.resultCode===200){
+          this.$message({
+            type:'success',
+            message:res.message,
+          })
+          this.closeCreateDialog()
+          this.refreshData()
+        }else{
+          this.$message({
+            type:'error',
+            message:res.message,
+          })
+        }
+      })
+    },
+
+    showCreateDialog() {
+      this.showSettingCreateDialog = true
+    },
   },
   created() {
     this.loading = false
-    this.getTPISList()
-    this.getRoleList()
+    this.initData()
     this.postTPAuditInputSettingList()
   }
 }
@@ -272,7 +379,7 @@ export default {
     justify-content: right;
   }
 
-  .titleBox{
+  .title-box{
     margin: 15px 0;
     display: flex;
     justify-content: space-between;

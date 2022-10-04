@@ -18,6 +18,7 @@ import AnnouncementDetail from '../../views/adminView/Announcement/AnnouncementD
 import ThesisProposalSetting from '../../views/adminView/WebViewSetting/ThesisProposalSettingView'
 import ThesisSettingView from '../../views/adminView/WebViewSetting/ThesisSettingView'
 import AuditStatusCategorySettingView from '../../views/adminView/WebViewSetting/AuditStatusCategorySettingVIew'
+import ApprovalProcessSetting from "../../views/adminView/WebViewSetting/approvalProcessSetting";
 const admin = {
     path:'/admin',
     name:'Admin',
@@ -175,6 +176,15 @@ const admin = {
             meta:{
                 title: '毕业设计论文提交页面设置',
                 role:'1000',
+                requiresAuth: true,
+            }
+        },{
+            path: '/admin/approvalProcessSetting',
+            name: 'ApprovalProcessSetting',
+            component: ApprovalProcessSetting,
+            meta: {
+                title: '开题报告审批流设置页面',
+                role: '1000',
                 requiresAuth: true,
             }
         }

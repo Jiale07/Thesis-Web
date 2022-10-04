@@ -71,20 +71,16 @@ export default {
 </script>
 
 <style scoped lang="less">
-.table-box {
+.display-flex {
+  display: flex;
+  align-items: center;
+}
 
+.justify-end {
+  justify-content: flex-end;
+}
 
-  .display-flex {
-    display: flex;
-    align-items: center;
-  }
-
-  .justify-end {
-    justify-content: flex-end;
-  }
-
-  .button-box {
-    margin-left: 10px;
-  }
+.button-box {
+  margin-left: 10px;
 }
 </style>
