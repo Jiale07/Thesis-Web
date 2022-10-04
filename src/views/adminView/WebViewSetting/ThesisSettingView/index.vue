@@ -1,41 +1,46 @@
 <template>
   <div>
     <setting-view-header
-      :header-title="`开题报告提交页面——页面设置`"
-      @on-click-back="goBack"
+        :header-title="`开题报告提交页面——页面设置`"
+        @on-click-back="goBack"
     >
     </setting-view-header>
     <div class="myContainer">
       <div>
-        <addThesisInputSetting
-            :tableDataLength="tableDataLength"
-          :getThesisInputSettingList="getThesisInputSettingList"
-        ></addThesisInputSetting>
+        <el-button type="primary" @click="showCreateDialog">添加</el-button>
       </div>
       <div class="table-box">
         <setting-table
-          :tableData="tableData"
-          :tableColumn="tableColumn"
-          @on-click-delete="handleDelete"
+            :tableData="tableData"
+            :tableColumn="tableColumn"
+            @on-click-delete="handleDelete"
         >
         </setting-table>
       </div>
     </div>
     <setting-create-dialog
-      v-if="showSettingCreateDialog"
-      :title="'添加自定义输入项标题'"
-      :sourceForm="dialogSourceForm"
-      :dialogFormItems="dialogFormItems"
-      @on-submit="addThesisInputSettingItem"
-      @on-click-close="closeCreateDialog"
+        v-if="showSettingCreateDialog"
+        :title="'添加自定义输入项标题'"
+        :dialogFormItems="dialogFormItems"
+        @on-submit="addThesisInputSettingItem"
+        @on-click-close="closeCreateDialog"
+    >
+    </setting-create-dialog>
+    <setting-create-dialog
+        v-if="showSettingUpdateDialog"
+        :title="'更改自定义输入项标题'"
+        :sourceForm="dialogSourceForm"
+        :dialogFormItems="dialogFormItems"
+        @on-submit="updateThesisInputSettingItem"
+        @on-click-close="closeUpdateDialog"
     >
     </setting-create-dialog>
   </div>
 </template>
 
 <script>
-import addThesisInputSetting from './components/addThesisInputSetting'
 import {
+  addThesisInputSetting,
   deletedThesisInputSetting,
   getThesisInputSettingList, updateThesisInputSetting
 } from "../../../../axios/adminView/WebViewSetting/ThesisSettingView";
@@ -45,15 +50,16 @@ import SettingCreateDialog from '../../../../components/backStage/settingCreateD
 
 export default {
   name: "ThesisSettingView",
-  data(){
-    return{
-      inputEmpty:'暂无数据',
-      tableData:[],
-      loading:false,
+  data() {
+    return {
+      inputEmpty: '暂无数据',
+      tableData: [],
+      loading: false,
 
-      tableDataLength:0,
+      tableDataLength: 0,
 
       showSettingCreateDialog: false,
+      showSettingUpdateDialog: false,
 
       dialogFormItems: [
         {
@@ -76,8 +82,7 @@ export default {
       }
     }
   },
-  components:{
-    addThesisInputSetting,
+  components: {
     SettingViewHeader,
     SettingTable,
     SettingCreateDialog,
@@ -112,7 +117,7 @@ export default {
               label: '更改',
               type: 'warning',
               size: 'mini',
-              clickFunction: this.showCreateDialog,
+              clickFunction: this.showUpdateDialog,
             },
             {
               prop: 'delete',
@@ -124,51 +129,75 @@ export default {
           ]
         }
       ]
-    }
+    },
   },
-  methods:{
-    goBack(){
+  methods: {
+    goBack() {
       this.$router.go(-1)
     },
 
-    getThesisInputSettingList(){
-      getThesisInputSettingList().then(result=>{
+    getThesisInputSettingList() {
+      getThesisInputSettingList().then(result => {
         let res = result.data
-        if (res.resultCode===200){
-          this.tableDataLength = res.data.length+1
+        if (res.resultCode === 200) {
+          this.tableDataLength = res.data.length + 1
           this.tableData = res.data
-        }else{
+        } else {
           this.inputEmpty = res.message
         }
       })
     },
 
-    handleDelete(row){
-      deletedThesisInputSetting({id: row.id}).then(result=>{
+    handleDelete(row) {
+      deletedThesisInputSetting({id: row.id}).then(result => {
         let res = result.data
-        if (res.resultCode===200){
+        if (res.resultCode === 200) {
           this.$message({
-            type:'success',
-            message:res.message
+            type: 'success',
+            message: res.message
           })
           this.getThesisInputSettingList()
-        }else{
+        } else {
           this.$message({
-            type:'error',
-            message:res.message
+            type: 'error',
+            message: res.message
           })
         }
       })
     },
 
 
-    addThesisInputSettingItem(form) {
+    updateThesisInputSettingItem(form) {
       let GDTISObject = {
         id: form.id,
-        serialNumber:form.serialNumber,
-        titleName:form.titleName
+        serialNumber: form.serialNumber,
+        titleName: form.titleName
       }
-      updateThesisInputSetting(GDTISObject).then(result=>{
+      updateThesisInputSetting(GDTISObject).then(result => {
+        let res = result.data
+        if (res.resultCode === 200) {
+          this.$message({
+            type: 'success',
+            message: res.message
+          })
+          this.dialogFormVisible = false
+          this.getThesisInputSettingList()
+          this.closeUpdateDialog()
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.message
+          })
+        }
+      })
+    },
+
+    addThesisInputSettingItem(form) {
+      let params = {
+        serialNumber: form.serialNumber,
+        titleName: form.titleName,
+      }
+      addThesisInputSetting(params).then(result=>{
         let res = result.data
         if (res.resultCode===200){
           this.$message({
@@ -178,11 +207,6 @@ export default {
           this.dialogFormVisible = false
           this.getThesisInputSettingList()
           this.closeCreateDialog()
-        }else{
-          this.$message({
-            type:'error',
-            message:res.message
-          })
         }
       })
     },
@@ -191,12 +215,21 @@ export default {
       this.showSettingCreateDialog = false
     },
 
-    showCreateDialog(row) {
+    closeUpdateDialog() {
+      this.showSettingUpdateDialog = false
+    },
+
+    showUpdateDialog(row) {
       this.dialogSourceForm.id = row.id
       this.dialogSourceForm.serialNumber = row.serialNumber
       this.dialogSourceForm.titleName = row.titleName
+      this.showSettingUpdateDialog = true
+    },
+
+    showCreateDialog() {
       this.showSettingCreateDialog = true
-    }
+    },
+
   },
 
   created() {

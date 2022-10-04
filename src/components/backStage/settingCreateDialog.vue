@@ -40,12 +40,10 @@ export default {
     return {
       dialogVisible: true,
       formLabelWidth: "120px",
-
       editForm: {
         serialNumber: 0,
         titleName: ''
       },
-
       emptyEditForm: {
         serialNumber: 0,
         titleName: ''
