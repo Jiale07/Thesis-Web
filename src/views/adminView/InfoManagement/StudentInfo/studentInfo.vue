@@ -1,74 +1,22 @@
 <template>
-  <div>
-    <div class = "header myContainer">
-      <BaseSelectGroup
-          :value1="this.selectGroup.collegeId"
-          :value2="this.selectGroup.majorId"
-          :value3="this.selectGroup.classId"
-          :getAccountList="getAccountList"
-          :getMajorInfo="getMajorInfo"
-      ></BaseSelectGroup>
-      <!--添加student组件-->
-      <BaseAddStudent
-        :getAccountList="getAccountList"
-        :currentPage="pageInfo.current_page"
-        :pageSize="pageInfo.page_size"
-      />
-      <!--更改student组件-->
-    </div>
-    <div class="myContainer">
-      <el-table
-          :data="pageInfo.tableData"
-          :empty-text="emptyText"
-          style="width: 100%"
+  <div class="student-info-management-box container">
+    <div class="header-box">
+      <query-filter
+          :srcFilterOptionArray="filterData"
+          @reset-filter-data="resetFilterDate"
+          @on-filter-change="handlerFilterChange"
       >
-        <el-table-column
-            label="学号"
-            prop="id">
-        </el-table-column>
-        <el-table-column
-            label="姓名"
-            prop="studentName">
-        </el-table-column>
-        <el-table-column
-            label="学院"
-            prop="collegeName">
-        </el-table-column>
-        <el-table-column
-            label="专业"
-            prop="majorName">
-        </el-table-column>
-        <el-table-column
-            label="班级"
-            prop="classId">
-        </el-table-column>
-        <el-table-column
-            label="创建时间"
-            prop="createTime">
-        </el-table-column>
-        <el-table-column
-            label="更新时间"
-            prop="updateTime">
-        </el-table-column>
-        <el-table-column
-            align="right">
-          <template slot-scope="scope" >
-            <div class="myTemplate">
-              <BaseUpdateStudent
-                :index="scope.$index"
-                :row="scope.row"
-                :getAccountList="getAccountList"
-                :currentPage="pageInfo.current_page"
-                :pageSize="pageInfo.page_size"
-              />
-              <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
+      </query-filter>
+    </div>
+    <div class="content-box">
+      <info-management-table
+          class="table-box"
+          :props-custom-table-columns="customTableColumns"
+          :table-data="pageInfo.tableData"
+      >
+      </info-management-table>
+    </div>
+    <div class="footer-box">
       <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -81,62 +29,113 @@
           class="myPageStyle">
       </el-pagination>
     </div>
-
-
   </div>
 </template>
 
 <script>
-import BaseSelectGroup from './component/BaseSelectGroup'
-import BaseAddStudent from './component/BaseAddStudent'
-import BaseUpdateStudent from './component/BaseUpdateStudent'
-import {
-  deletedStudent,
-  getStudentInfo
-} from "../../../../axios/adminView/infoManagement/StudentInfo";
-import {
-  getCollegeList,
-  getMajorList
-} from "../../../../axios/adminView/public";
+// import BaseAddStudent from './component/BaseAddStudent'
+// TODO 学生信息更新后续会重新再写一个版本
+// import BaseUpdateStudent from './component/BaseUpdateStudent'
+import {deletedStudent, getStudentInfo} from "../../../../axios/adminView/infoManagement/StudentInfo";
+import {getCollegeList, getMajorList} from "../../../../axios/adminView/public";
 import {mapState} from "vuex";
 import {dateFormatter} from "../../../../util/dateFormatter";
 import {getRoleList} from "../../../../axios/public/RoleAbout";
+import QueryFilter from "../../../../components/backStage/queryFilter";
+import InfoManagementTable from "../../../../components/backStage/infoManagementTable/index.vue";
+import {cloneDeep} from "lodash";
+
+const filterFieldMap = {
+  'college': 'collegeId',
+  'major': 'majorId',
+  'class': 'classId',
+}
 export default {
   name: "studentInfo",
   data() {
     return {
       passwordShow:false,
       emptyText:'',
+      collegeOptions: [],
+      majorOptions: [],
+      collegeId: 0,
+      filterData: [],
+      pageInfo:{
+        //当前页数
+        current_page: 1,
+        total:100,
+        //每页显示条目个数
+        page_size:10,
+        pager_Count:8,
+        //最大页数
+        page_count:0,
+        page_sizes:[5, 10, 15, 20],
+        tableData:[{}],
+      },
+      queryFilterOptionArray: [
+        {
+          key: 'college',
+          title: '学院',
+          componentName: 'el-select',
+          value: '',
+          options: [],
+          isHide: false,
+        },
+        {
+          key: 'major',
+          title: '专业',
+          componentName: 'el-select',
+          value: '',
+          options: [],
+          isHide: false,
+        }
+      ]
     }
   },
   computed:{
-    ...mapState('studentInfo',['selectGroup','search','pageInfo','publicOption']),
-
-    collegeId: {
-      get() {
-        return this.$store.state.studentInfo.selectGroup.collegeId
-      },
-      set(value) {
-        this.$store.commit('studentInfo/updateSearchCollegeId',value)
-        this.getMajorInfo(value)
-        this.$store.commit('studentInfo/updateSearchMajorId','')
-      }
-    },
-    majorId:{
-      get() {
-        return this.$store.state.studentInfo.selectGroup.majorId
-      },
-      set(value) {
-        this.$store.commit('studentInfo/updateSearchMajorId',value)
-      }
-    },
-    classId:{
-      get() {
-        return this.$store.state.studentInfo.selectGroup.classId
-      },
-      set(value) {
-        this.$store.commit('studentInfo/updateSearchClassId',value)
-      }
+    ...mapState('studentInfo',['search','publicOption']),
+    customTableColumns() {
+      return [
+        {
+          field: 'id',
+          title: '学号'
+        },
+        {
+          field: 'studentName',
+          title: '姓名'
+        },
+        {
+          field: 'collegeName',
+          title: '学院'
+        },
+        {
+          field: 'majorName',
+          title: '专业'
+        },
+        {
+          field: 'classId',
+          title: '班级'
+        },
+        {
+          field: 'createTime',
+          title: '创建时间'
+        },
+        {
+          field: 'updateTime',
+          title: '更新时间'
+        },
+      ]
+    }
+  },
+  components:{
+    InfoManagementTable,
+    // BaseAddStudent,
+    // BaseUpdateStudent,
+    QueryFilter,
+  },
+  watch: {
+    majorOptions() {
+      this.filterData.find(item => item.key === 'major').options = this.majorOptions
     }
   },
   methods: {
@@ -144,18 +143,12 @@ export default {
       this.deletedStudent(row.id)
     },
     // 获取学会生账号信息
-    getAccountList(currentPage,pageSize){
-      getStudentInfo({
-        currentPage,
-        pageSize,
-        collegeId:this.collegeId,
-        majorId:this.majorId,
-        classId:this.classId
-      }).then(res=>{
+    getStudentInfoList(params){
+      return getStudentInfo(params).then(res=>{
         let result = res.data
         if (result.resultCode===200){
           if (result.data.records.length===0){
-            this.getAccountList(result.data.current-1,this.pageInfo.page_size)
+            this.getStudentInfoList(result.data.current-1,this.pageInfo.page_size)
           }
           //当前页数
           this.pageInfo.current_page = result.data.current
@@ -179,19 +172,26 @@ export default {
     },
     // 更改页面可见函数大小
     handleSizeChange(val) {
-      this.pageInfo.page_size = val
-      this.getAccountList(this.pageInfo.current_page,val)
+      let parmas = {
+        currentPage: this.pageInfo.current_page,
+        pageSize: val,
+      }
+      this.getStudentInfoList(parmas)
     },
     //当前页切换
     handleCurrentChange(val) {
       this.pageInfo.current_page = val
-      this.getAccountList(val,this.pageInfo.page_size)
+      let params = {
+        currentPage: val,
+        pageSize: this.pageInfo.page_size
+      }
+      this.getStudentInfoList(params)
     },
     // 获取学院信息列表
     getCollegeInfo(){
-      getCollegeList().then(res=>{
+      return getCollegeList().then(res=>{
         if(res.data.resultCode ===200){
-          this.publicOption.CollegeOptions= res.data.data
+          this.collegeOptions = this.formatQueryFilterOption('college',res.data.data)
         }else{
           this.$message({
             type:'error',
@@ -200,13 +200,34 @@ export default {
         }
       })
     },
+    formatQueryFilterOption(key, data) {
+      if (key === 'college') {
+        return data.map(item => {
+          return {
+            key: item.id,
+            label: item.collegeName,
+            value: item.id,
+            disable: false,
+          }
+        })
+      } else if (key === 'major') {
+        return data.map(item => {
+          return {
+            key: item.id,
+            label: item.majorName,
+            value: item.id,
+            disable: false,
+          }
+        })
+      }
+    },
     // 获取专业信息列表
     getMajorInfo(collegeId){
       getMajorList({
         collegeId
       }).then(res=>{
         if(res.data.resultCode ===200){
-          this.search.option.MajorOptions= res.data.data
+          this.majorOptions = this.formatQueryFilterOption('major', res.data.data)
         }else{
           this.$message({
             type:'error',
@@ -225,12 +246,7 @@ export default {
             type:'success',
             message:result.message
           })
-          this.getAccountList(
-              this.pageInfo.current_page,
-              this.pageInfo.page_size,
-              this.collegeId,
-              this.majorId,
-              this.classId)
+          this.refreshToStudentInfoList()
         }else{
           this.$message({
             type:'error',
@@ -239,9 +255,8 @@ export default {
         }
       })
     },
-
     getRoleList(){
-      getRoleList().then(result=>{
+      return getRoleList().then(result=>{
         let res = result.data
         if (res.resultCode===200){
           let data = res.data
@@ -253,46 +268,98 @@ export default {
           this.$store.commit("studentInfo/updateRoleOptions",studentOption)
         }
       })
+    },
+    handlerSaveOptionsValue(valueArray) {
+      let filterConditionsObj = {}
+      valueArray.forEach(item => {
+        filterConditionsObj[filterFieldMap[item.key]] = item.value
+      })
+      this.refreshToStudentInfoList(filterConditionsObj)
+      let collegeId = valueArray.find(item => item.key === 'college').value
+      if (!this.$isEmpty(collegeId)) {
+        this.getMajorInfo(collegeId)
+      }
+    },
+    initData() {
+      const params = {
+        currentPage: this.pageInfo.current_page,
+        pageSize: this.pageInfo.page_size,
+      }
+      return this.getStudentInfoList(params)
+    },
+    initFilterData() {
+      let optionList = this.queryFilterOptionArray
+      optionList.find(item => item.key === 'college').options = this.collegeOptions
+      optionList.find(item => item.key === 'major').options = this.majorOptions
+      this.filterData = cloneDeep(this.queryFilterOptionArray)
+    },
+    refreshToStudentInfoList(filterConditionsObj) {
+      const params = {
+        currentPage: this.pageInfo.current_page,
+        pageSize: this.pageInfo.page_size,
+        ...filterConditionsObj,
+      }
+      this.getStudentInfoList(params)
+    },
+    handlerFilterChange(item) {
+      let filterItemObj = this.filterData.find(filterItem => filterItem.key === item.key)
+      filterItemObj.value = item.value
+      if (item.key === 'college') {
+        let relateFilterItem = this.filterData.find(filterItem => filterItem.key === 'major')
+        relateFilterItem.value = ''
+      }
+      this.handlerSaveOptionsValue(this.filterData)
+    },
+    resetFilterDate() {
+      this.initFilterData()
+      this.filterData.find(item => item.key === 'college').options = this.collegeOptions
+      this.filterData.find(item => item.key === 'major').options = []
+      this.refreshToStudentInfoList()
     }
   },
-  components:{
-    BaseSelectGroup,
-    BaseAddStudent,
-    BaseUpdateStudent
-  },
-
-  created() {
-    // 初始化表格信息
-    this.getAccountList(this.pageInfo.current_page,this.pageInfo.page_size)
-    this.getCollegeInfo()
-    this.getRoleList()
+  async created() {
+    await this.getCollegeInfo()
+    await this.getRoleList()
+    await this.initFilterData()
+    await this.initData()
   },
 }
 </script>
 
 <style scoped lang="less">
-
-.myContainer{
-  padding: 10px;
-  margin-bottom: 10px;
+.container{
   border-radius: 10px;
   background-color: #ffffff;
 }
-
-.header{
+.student-info-management-box {
+  height: 100%;
   display: flex;
-  justify-content: space-between;
-  line-height: 60px;
-}
+  flex-direction: column;
+  overflow: auto;
 
-.myPageStyle{
-  padding-top: 10px;
-  text-align: center;
-}
+  .header-box {
+    padding: 10px 10px 0px;
+    flex-shrink: 0;
+  }
 
-.myTemplate{
-  display: flex;
-  justify-content: space-around;
-}
+  .content-box {
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    flex: 1;
 
+    .table-box {
+      flex: 1;
+      overflow: hidden;
+    }
+  }
+
+  .footer-box {
+    padding: 0 10px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
 </style>

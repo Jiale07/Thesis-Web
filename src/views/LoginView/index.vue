@@ -11,11 +11,11 @@
         <el-form-item label="密码" prop="password">
           <el-input type="password" v-model.number="ruleForm.password" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item prop="verifyStatus">
-          <SlidingValidationComponent
-              @successFun="onSuccessFun"
-          ></SlidingValidationComponent>
-        </el-form-item>
+<!--        <el-form-item prop="verifyStatus">-->
+<!--          <SlidingValidationComponent-->
+<!--              @successFun="onSuccessFun"-->
+<!--          ></SlidingValidationComponent>-->
+<!--        </el-form-item>-->
         <el-form-item>
           <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
         </el-form-item>
@@ -27,7 +27,8 @@
 <script>
 import {login} from '../../axios/loginApi'
 import {mapMutations, mapState} from 'vuex'
-import SlidingValidationComponent from './SlidingValidationComponent'
+// TODO 暂时关闭登录时的人机测试
+// import SlidingValidationComponent from './SlidingValidationComponent'
 
 export default {
   name: "Login",
@@ -59,15 +60,15 @@ export default {
       }
     };
     return {
-      // ruleForm: {
-      //   id: '202111010101',
-      //   password: 123457,
-      //   verifyStatus:false,
-      // },
       ruleForm: {
-        id: '',
-        password: '',
+        id: '10001',
+        password: 123456,
+        verifyStatus: true,
       },
+      // ruleForm: {
+      //   id: '',
+      //   password: '',
+      // },
 
       rules: {
         id: [
@@ -87,9 +88,9 @@ export default {
 
     }
   },
-  components:{
-    SlidingValidationComponent
-  },
+  // components:{
+  //   SlidingValidationComponent
+  // },
   computed:{
     ...mapState('loginAbout',['user','roleConfigList'])
   },
