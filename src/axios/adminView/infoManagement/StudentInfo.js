@@ -42,3 +42,11 @@ export function updateStudent(params){
         params
     })
 }
+
+export function getDefaultRoleList(params){
+    return request({
+        url:`public/getDefaultRoleList`,
+        method:'post',
+        params
+    })
+}

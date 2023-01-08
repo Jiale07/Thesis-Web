@@ -1,6 +1,6 @@
 import request from "../../index"
 
-const api = "/student/account/accountHome"
+const api = "/student/account/home"
 
 export function postAccountBasicInformation(params){
     return request({

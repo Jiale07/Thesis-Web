@@ -10,9 +10,12 @@
     </div>
     <div class="content-box">
       <info-management-table
+          :propLoading="loading"
           class="table-box"
+          :prop-border="'inner'"
           :props-custom-table-columns="customTableColumns"
           :table-data="pageInfo.tableData"
+          @handle-filter-change="handleFilterChange"
       >
       </info-management-table>
     </div>
@@ -36,14 +39,18 @@
 // import BaseAddStudent from './component/BaseAddStudent'
 // TODO 学生信息更新后续会重新再写一个版本
 // import BaseUpdateStudent from './component/BaseUpdateStudent'
-import {deletedStudent, getStudentInfo} from "../../../../axios/adminView/infoManagement/StudentInfo";
+import {
+  deletedStudent,
+  getStudentInfo,
+  getDefaultRoleList,
+} from "../../../../axios/adminView/infoManagement/StudentInfo";
 import {getCollegeList, getMajorList} from "../../../../axios/adminView/public";
 import {mapState} from "vuex";
-import {dateFormatter} from "../../../../util/dateFormatter";
 import {getRoleList} from "../../../../axios/public/RoleAbout";
 import QueryFilter from "../../../../components/backStage/queryFilter";
 import InfoManagementTable from "../../../../components/backStage/infoManagementTable/index.vue";
 import {cloneDeep} from "lodash";
+import $dayjs from "dayjs";
 
 const filterFieldMap = {
   'college': 'collegeId',
@@ -70,7 +77,7 @@ export default {
         //最大页数
         page_count:0,
         page_sizes:[5, 10, 15, 20],
-        tableData:[{}],
+        tableData:[],
       },
       queryFilterOptionArray: [
         {
@@ -89,13 +96,19 @@ export default {
           options: [],
           isHide: false,
         }
-      ]
+      ],
+      loading: false
     }
   },
   computed:{
     ...mapState('studentInfo',['search','publicOption']),
     customTableColumns() {
       return [
+        {
+          type: 'seq',
+          title: '',
+          width: '50px',
+        },
         {
           field: 'id',
           title: '学号'
@@ -105,24 +118,35 @@ export default {
           title: '姓名'
         },
         {
-          field: 'collegeName',
-          title: '学院'
+          field: 'college',
+          title: '学院',
+          filterOptions: this.collegeOptions,
+          // filterMultiple: false,
+          // options: [],
+          formatter: this.formatCollege,
+          slots: {
+            header: 'filter_radio',
+          },
         },
         {
-          field: 'majorName',
-          title: '专业'
+          field: 'major',
+          title: '专业',
+          formatter: this.formatMajor,
         },
         {
-          field: 'classId',
-          title: '班级'
+          field: 'class',
+          title: '班级',
+          formatter: this.formatClass,
         },
         {
           field: 'createTime',
-          title: '创建时间'
+          title: '创建时间',
+          formatter: this.formatDate,
         },
         {
           field: 'updateTime',
-          title: '更新时间'
+          title: '更新时间',
+          formatter: this.formatDate
         },
       ]
     }
@@ -142,8 +166,8 @@ export default {
     handleDelete(index, row) {
       this.deletedStudent(row.id)
     },
-    // 获取学会生账号信息
     getStudentInfoList(params){
+      this.loading = true
       return getStudentInfo(params).then(res=>{
         let result = res.data
         if (result.resultCode===200){
@@ -155,19 +179,14 @@ export default {
           //总条数
           this.pageInfo.total = result.data.total
           //结果集
-          // let recordsLength = result.data.records.length
-          let records = result.data.records
-          records.forEach((value,index,array)=>{
-            array[index].createTime = dateFormatter(array[index].createTime)
-            array[index].updateTime = dateFormatter(array[index].updateTime)
-          })
-          this.pageInfo.tableData = records
+          this.pageInfo.tableData = result.data.records
           //最大页数
           this.pageInfo.page_count = result.data.pages
         }else{
           this.pageInfo.tableData = []
           this.emptyText = result.message
         }
+        this.loading = false
       })
     },
     // 更改页面可见函数大小
@@ -315,6 +334,33 @@ export default {
       this.filterData.find(item => item.key === 'college').options = this.collegeOptions
       this.filterData.find(item => item.key === 'major').options = []
       this.refreshToStudentInfoList()
+    },
+    formatCollege({row}) {
+      return row.collegeName
+    },
+    formatMajor({row}) {
+      return row.majorName
+    },
+    formatClass({row}) {
+      return row.classId
+    },
+    formatDate({cellValue}) {
+      return $dayjs(cellValue).format("YYYY-MM-DD HH:mm:ss")
+    },
+    getInformation(){
+      getDefaultRoleList({}).then(res => {
+        console.log(res)
+      })
+    },
+    handleFilterChange({field, values}) {
+      console.log('123')
+      let filterParams = {}
+      if ('college' === field) {
+        filterParams.collegeId = values.join()
+      }
+      this.$nextTick(() => {
+        this.refreshToStudentInfoList(filterParams)
+      })
     }
   },
   async created() {
@@ -338,7 +384,7 @@ export default {
   overflow: auto;
 
   .header-box {
-    padding: 10px 10px 0px;
+    padding: 10px 10px 0;
     flex-shrink: 0;
   }
 
