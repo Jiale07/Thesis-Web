@@ -6,6 +6,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import VueQuillEditor from 'vue-quill-editor'
 import {cloneDeep} from "lodash";
+import './assets/icons/index'
 // require styles 引入样式
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'

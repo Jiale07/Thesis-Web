@@ -7,7 +7,10 @@
         @filter-change="handleFilterChange"
     >
       <template #filter_radio="{column}" >
-        <span @click="handleShowFilterContainer(column)">{{column.title}}</span>
+        <div class="header-container">
+          <span @click="handleShowFilterContainer(column)">{{column.title}}</span>
+          <svg-icon icon-class="filter"></svg-icon>
+        </div>
       </template>
     </vxe-grid>
 
@@ -26,6 +29,7 @@
 </template>
 
 <script>
+import SvgIcon from "@/components/svgIcon/index.vue";
 export default {
   name: "InfoManagementTable",
   props: {
@@ -51,6 +55,9 @@ export default {
       currFilterOptions: [],
       filterTop: 0,
     }
+  },
+  components() {
+    SvgIcon
   },
   computed: {
     customTableOptions() {
@@ -119,5 +126,10 @@ export default {
   background-color: #ffffff;
   padding: 16px;
   border-radius: 10px;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
 }
 </style>
