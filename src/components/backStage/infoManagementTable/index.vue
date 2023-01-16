@@ -4,32 +4,23 @@
         class="vxe-grid-style"
         v-bind="customTableOptions"
         :cloumns="propsCustomTableColumns"
-        @filter-change="handleFilterChange"
     >
       <template #filter_radio="{column}" >
-        <div class="header-container">
-          <span @click="handleShowFilterContainer(column)">{{column.title}}</span>
-          <svg-icon icon-class="filter"></svg-icon>
-        </div>
+        <filter-radio
+          :prop-filter-option="getColumnFilterOption(column)"
+          :props-title="column.title"
+          :props-field="column.field"
+          @handle-filter-item-select="handleFilterItemSelect($event, column)"
+        >
+        </filter-radio>
       </template>
     </vxe-grid>
-
-    <div v-if="'college' === currFilterColumn" class="filterBox">
-      <vxe-list height="240" class="my-list" :data="currFilterOptions">
-        <template #default="{ items }">
-          <div
-              class="my-list-item"
-              v-for="(item, index) in items"
-              :key="index"
-          >{{ item.label }}</div>
-        </template>
-      </vxe-list>
-    </div>
   </div>
 </template>
 
 <script>
-import SvgIcon from "@/components/svgIcon/index.vue";
+// import SvgIcon from "@/components/svgIcon/index.vue";
+import FilterRadio from "./components/filterRadio.vue";
 export default {
   name: "InfoManagementTable",
   props: {
@@ -50,14 +41,12 @@ export default {
   },
   data() {
     return {
-      tableOptions: {},
-      currFilterColumn: '',
-      currFilterOptions: [],
-      filterTop: 0,
+      filterValueArray: []
     }
   },
-  components() {
-    SvgIcon
+  components: {
+    // SvgIcon,
+    FilterRadio
   },
   computed: {
     customTableOptions() {
@@ -87,17 +76,26 @@ export default {
     handleFilterChange({field, values}) {
       this.$emit("handle-filter-change", {field, values})
     },
-    handleShowFilterContainer() {
-      // let {field} = colmun
-      // let {filterOptions} = this.propsCustomTableColumns.find(item => item.field === field)
-      // if (this.currFilterColumn === field) {
-      //   this.currFilterColumn = ''
-      //   this.currFilterOptions = []
-      // } else {
-      //   this.currFilterColumn = field
-      //   this.currFilterOptions = filterOptions
-      // }
-    }
+    getColumnFilterOption(column) {
+      return this.propsCustomTableColumns.find(item => item.field === column.field).filterOptions
+    },
+    handleFilterItemSelect(event, column) {
+      let {field} = column
+      let {value} = event
+      let filterSelectedObj = this.filterValueArray.find(item =>  item.key === field)
+      if (filterSelectedObj) {
+        filterSelectedObj.value = value
+      } else {
+        this.filterValueArray.push({
+          key: field,
+          value
+        })
+      }
+      this.$emit('handle-filter-change', {
+        key: field,
+        value,
+      })
+    },
   },
   created() {
 
@@ -126,10 +124,5 @@ export default {
   background-color: #ffffff;
   padding: 16px;
   border-radius: 10px;
-}
-
-.header-container {
-  display: flex;
-  align-items: center;
 }
 </style>

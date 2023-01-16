@@ -43,10 +43,10 @@ import {
   deletedStudent,
   getStudentInfo,
   getDefaultRoleList,
-} from "../../../../axios/adminView/infoManagement/StudentInfo";
-import {getCollegeList, getMajorList} from "../../../../axios/adminView/public";
+} from "@/axios/adminView/infoManagement/StudentInfo";
+import {getCollegeList, getMajorList} from "@/axios/adminView/public";
 import {mapState} from "vuex";
-import {getRoleList} from "../../../../axios/public/RoleAbout";
+import {getRoleList} from "@/axios/public/RoleAbout";
 import QueryFilter from "../../../../components/backStage/queryFilter";
 import InfoManagementTable from "../../../../components/backStage/infoManagementTable/index.vue";
 import {cloneDeep} from "lodash";
@@ -221,14 +221,21 @@ export default {
     },
     formatQueryFilterOption(key, data) {
       if (key === 'college') {
-        return data.map(item => {
+        let resultArray = []
+        resultArray.push({
+          key: 0,
+          label: '全部',
+          value: 0,
+          disable: false,
+        })
+        return resultArray.concat(data.map(item => {
           return {
             key: item.id,
             label: item.collegeName,
             value: item.id,
             disable: false,
           }
-        })
+        }))
       } else if (key === 'major') {
         return data.map(item => {
           return {
@@ -352,12 +359,13 @@ export default {
         console.log(res)
       })
     },
-    handleFilterChange({field, values}) {
-      console.log('123')
+    handleFilterChange({key, value}) {
       let filterParams = {}
-      if ('college' === field) {
-        filterParams.collegeId = values.join()
+      console.log('field', key)
+      if ('college' === key) {
+        filterParams.collegeId = value
       }
+      console.log('filterParams', filterParams)
       this.$nextTick(() => {
         this.refreshToStudentInfoList(filterParams)
       })
