@@ -3,14 +3,14 @@
     <vxe-grid
         class="vxe-grid-style"
         v-bind="customTableOptions"
-        :cloumns="propsCustomTableColumns"
     >
-      <template #filter_radio="{column}" >
+      <template #filter_radio="{column}">
         <filter-radio
-          :prop-filter-option="getColumnFilterOption(column)"
-          :props-title="column.title"
-          :props-field="column.field"
-          @handle-filter-item-select="handleFilterItemSelect($event, column)"
+            :prop-filter-option="getColumnOtherInfo(column).filterOptions"
+            :props-title="column.title"
+            :props-field="column.field"
+            :props-value="getColumnOtherInfo(column).filterValue"
+            @handle-filter-item-select="handleFilterChange($event, column)"
         >
         </filter-radio>
       </template>
@@ -19,8 +19,9 @@
 </template>
 
 <script>
-// import SvgIcon from "@/components/svgIcon/index.vue";
 import FilterRadio from "./components/filterRadio.vue";
+import {FilterComponentType} from '@/util/constant/component/infoManagementTable'
+
 export default {
   name: "InfoManagementTable",
   props: {
@@ -41,11 +42,10 @@ export default {
   },
   data() {
     return {
-      filterValueArray: []
+      // filterValueArray: []
     }
   },
   components: {
-    // SvgIcon,
     FilterRadio
   },
   computed: {
@@ -73,28 +73,26 @@ export default {
   },
   watch: {},
   methods: {
-    handleFilterChange({field, values}) {
-      this.$emit("handle-filter-change", {field, values})
+    getColumnOtherInfo(column) {
+      return this.propsCustomTableColumns.find(item => item.field === column.field)
     },
-    getColumnFilterOption(column) {
-      return this.propsCustomTableColumns.find(item => item.field === column.field).filterOptions
-    },
-    handleFilterItemSelect(event, column) {
-      let {field} = column
+    handleFilterChange(event, column) {
       let {value} = event
-      let filterSelectedObj = this.filterValueArray.find(item =>  item.key === field)
-      if (filterSelectedObj) {
-        filterSelectedObj.value = value
-      } else {
-        this.filterValueArray.push({
-          key: field,
-          value
-        })
-      }
-      this.$emit('handle-filter-change', {
-        key: field,
-        value,
-      })
+      let field = column.field
+      let resultFilterInfoArray = this.propsCustomTableColumns.filter(item => [FilterComponentType.Radio].includes(item.filterComponentType))
+      this.$emit('handle-filter-change', resultFilterInfoArray.map(item => {
+        if (field === item.field) {
+          return {
+            key: item.field,
+            value
+          }
+        } else {
+          return {
+            key: item.field,
+            value: item.filterValue
+          }
+        }
+      }), column.field)
     },
   },
   created() {
