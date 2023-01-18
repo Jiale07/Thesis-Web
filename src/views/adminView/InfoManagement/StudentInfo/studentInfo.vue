@@ -405,36 +405,50 @@ export default {
         console.log(res)
       })
     },
-    handleFilterChange(array, currChangeFilterField) {
+    async handleFilterChange(filterChangeArray, currChangeFilterField) {
       let filterParams = {}
-      const srcCustomTableColumns = cloneDeep(this.customTableColumns)
-      array.forEach(changeItem => {
-        let {key, value} = changeItem
-        let filterChangeObj = this.customTableColumns.find(item => item.field === key)
-        filterChangeObj.filterValue = value
-      })
-      array.forEach(async arrayItem => {
-        let majorColumn = this.customTableColumns.find(item => item.field === 'major')
-        if (arrayItem.value !== 'all') {
-          if (arrayItem.key === 'college') {
-            filterParams.collegeId = arrayItem.value
-            let collegeColumn = srcCustomTableColumns.find(item => item.field === arrayItem.key)
-            if (currChangeFilterField === 'college' ) {
-              majorColumn.filterValue = 'all'
-              if (collegeColumn.filterValue !== arrayItem.value) {
-                await this.getMajorInfo(arrayItem.value)
-                majorColumn.filterOptions = this.majorOptions
-              }
-            }
+      let columnInfo = this.customTableColumns.find(item => item.field === currChangeFilterField)
+      let filterChangeObj = filterChangeArray.find(item => item.key === currChangeFilterField)
+      switch (currChangeFilterField) {
+        case 'college': {
+          let majorColumnInfo = this.customTableColumns.find(item => item.field === 'major')
+          if (filterChangeObj.value === 'all') {
+            majorColumnInfo.filterOptions = []
+            columnInfo.filterValue = 'all'
           } else {
-            if (currChangeFilterField === 'college') {
-              let majorColumn = this.customTableColumns.find(item => item.field === 'major')
-              majorColumn.filterOptions = []
+            if (filterChangeObj.value !== 'all') {
+              await this.getMajorInfo(filterChangeObj.value)
+              majorColumnInfo.filterOptions = this.majorOptions
+            } else {
+              majorColumnInfo.filterOptions = []
             }
           }
-          console.log('majorColumn.filterValue', majorColumn.filterValue)
-          if (arrayItem.key === 'major' && majorColumn.filterValue !== 'all') {
-            filterParams.majorId = arrayItem.value
+          majorColumnInfo.filterValue = 'all'
+          columnInfo.filterValue = filterChangeObj.value
+          if (filterChangeObj.value !== 'all') {
+            filterParams.collegeId = filterChangeObj.value
+          }
+          break
+        }
+        case 'major': {
+          columnInfo.filterValue = filterChangeObj.value
+          if (filterChangeObj.value !== 'all') {
+            filterParams.majorId = filterChangeObj.value
+          }
+          break
+        }
+      }
+      // 其他筛选项
+      let tipFilterItemArray = filterChangeArray.map(item => item.key)
+      let otherColumnInfoArray = this.customTableColumns.filter(item => tipFilterItemArray.includes(item.field) && item.field !== currChangeFilterField)
+      otherColumnInfoArray.forEach(item => {
+        if (item.filterValue !== 'all') {
+          if (item.field === 'college') {
+            filterParams['collegeId'] = item.filterValue
+          } else if (item.field === 'major') {
+            filterParams['majorId'] = item.filterValue
+          } else {
+            filterParams[item.field] = item.filterValue
           }
         }
       })
