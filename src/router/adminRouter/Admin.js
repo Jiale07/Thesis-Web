@@ -19,6 +19,7 @@ import ThesisProposalSetting from '../../views/adminView/WebViewSetting/ThesisPr
 import ThesisSettingView from '../../views/adminView/WebViewSetting/ThesisSettingView'
 import AuditStatusCategorySettingView from '../../views/adminView/WebViewSetting/AuditStatusCategorySettingVIew'
 import ApprovalProcessSetting from "../../views/adminView/WebViewSetting/approvalProcessSetting";
+import StudentIDRuleSetting from '@/views/adminView/numberingRule/studentIDRuleSetting.vue'
 const admin = {
     path:'/admin',
     name:'Admin',
@@ -76,6 +77,15 @@ const admin = {
                 title:'专业信息管理',
                 role:'1000',
                 requiresAuth: true
+            }
+        },{
+            path: '/adminRouter/studentIDRuleSetting',
+            name: 'StudentIDRuleSetting',
+            component: StudentIDRuleSetting,
+            meta: {
+                title: '学生编号规则',
+                role: '1000',
+                requiresAuth: true,
             }
         },{
             path:'/role',

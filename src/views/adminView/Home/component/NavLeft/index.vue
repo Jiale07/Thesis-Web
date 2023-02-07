@@ -61,7 +61,11 @@ export default {
               text: '专业信息',
               path:'/adminRouter/majorInfo',
               isDisabled:false
-            },
+            },{
+              id: '1-5',
+              text: '学生编号管理',
+              path: '/adminRouter/studentIDRuleSetting'
+            }
           ]
         },{
           id:'2',
