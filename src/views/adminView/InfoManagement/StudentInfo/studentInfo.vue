@@ -1,8 +1,11 @@
 <template>
   <div class="student-info-management-box container">
-    <div class="header-box">
-      <h2>学生信息管理页面</h2>
-    </div>
+    <info-management-header
+      title="学生信息管理页面"
+      :buttonList="headerButtonList"
+      @on-click="handleHeaderClick"
+      @on-refresh="refreshToStudentInfoList"
+    ></info-management-header>
     <div class="content-box">
       <info-management-table
           :propLoading="loading"
@@ -34,6 +37,7 @@
 // import BaseAddStudent from './component/BaseAddStudent'
 // TODO 学生信息更新后续会重新再写一个版本
 // import BaseUpdateStudent from './component/BaseUpdateStudent'
+import InfoManagementHeader from "@/components/admin/infoManagementHeader/index.vue";
 import {
   deletedStudent,
   getStudentInfo,
@@ -46,6 +50,8 @@ import InfoManagementTable from "../../../../components/backStage/infoManagement
 import {cloneDeep} from "lodash";
 import $dayjs from "dayjs";
 import {FilterComponentType} from '@/util/constant/component/infoManagementTable'
+import {uuis} from '@/util/uuis'
+
 
 const filterFieldMap = {
   'college': 'collegeId',
@@ -56,7 +62,7 @@ export default {
   name: "studentInfo",
   data() {
     return {
-      tableKey: this.uuid(),
+      tableKey: uuis(),
       passwordShow: false,
       emptyText: '',
       collegeOptions: [],
@@ -99,8 +105,20 @@ export default {
   },
   computed: {
     ...mapState('studentInfo', ['search', 'publicOption']),
+    // TODO 由于与自定表达有关，暂时不开发该头部
+    headerButtonList() {
+      return [
+        {
+          key: 'add',
+          name: '添加',
+          type: 'primary',
+          isHead: true,
+        },
+      ].filter(item => !item.isHead)
+    }
   },
   components: {
+    InfoManagementHeader,
     InfoManagementTable,
     // BaseAddStudent,
     // BaseUpdateStudent,
@@ -137,12 +155,13 @@ export default {
         this.loading = false
       })
     },
-    // 更改页面可见函数大小
+    // 页面可见行数改变
     handleSizeChange(val) {
       let parmas = {
         currentPage: this.pageInfo.current_page,
         pageSize: val,
       }
+      this.pageInfo.page_size = val
       this.getStudentInfoList(parmas)
     },
     //当前页切换
@@ -454,12 +473,17 @@ export default {
       })
       this.$nextTick(() => {
         this.refreshToStudentInfoList(filterParams)
-        this.tableKey = this.uuid()
+        this.tableKey = uuis()
       })
     },
-    uuid() {
-      return Date.now().toString(36)
-    }
+    handleHeaderClick(key) {
+      switch (key) {
+        case 'add': {
+          console.log('显示添加窗口')
+          break;
+        }
+      }
+    },
   },
   async created() {
     await this.getCollegeInfo()
