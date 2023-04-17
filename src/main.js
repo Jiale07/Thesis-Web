@@ -13,6 +13,7 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import VXETable from 'vxe-table';
 import 'vxe-table/lib/style.css';
+import dayjs from "dayjs";
 Vue.use(VueQuillEditor)
 Vue.use(ElementUI);
 Vue.use(VXETable);
@@ -23,8 +24,9 @@ Vue.prototype.$isEmpty = function(value) {
   return value === '' || value === null || value === undefined
 }
 Vue.prototype.$cloneDeep = cloneDeep
+Vue.prototype.$dayjs = dayjs
 
-new Vue({
+  new Vue({
   router,
   store,
   render: h => h(App),

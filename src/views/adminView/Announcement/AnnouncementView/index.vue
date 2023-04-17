@@ -68,7 +68,6 @@ import {
   postDeletedAnnouncementLogic
 } from "../../../../axios/adminView/Announcement/Announcement";
 import AddAnnouncement from './components/addAnnouncement'
-import {dateFormatter} from "../../../../util/dateFormatter";
 
 export default {
   name: "Announcement",
@@ -113,8 +112,8 @@ export default {
           //结果集
           let records = res.data.records
           records.forEach(e=>{
-            e.createTime = dateFormatter(e.createTime)
-            e.updateTime = dateFormatter(e.updateTime)
+            e.createTime = this.$dayjs(e.createTime).format("YYYY-MM-DD hh:mm:ss")
+            e.updateTime = this.$dayjs(e.updateTime).format("YYYY-MM-DD hh:mm:ss")
           })
 
           this.pageInfo.tableData = records

@@ -75,7 +75,6 @@ import {
   deleteRolePermissionById, postFindOneRoleByRoleId, postFindRolePermissionByRoleId,
 
 } from "../../../../axios/adminView/RoleManagement/RoleInfo";
-import {dateFormatter} from "../../../../util/dateFormatter";
 import AddRolePermissionComponent from "./component/AddRolePermissionComponent"
 export default {
   name: "RolePermission",
@@ -115,8 +114,8 @@ export default {
         let result = res.data
         if (result.resultCode===200){
           let records = result.data
-          records.createTime = dateFormatter(records.createTime)
-          records.updateTime = dateFormatter(records.updateTime)
+          records.createTime = this.$dayjs(records.createTime).format("YYYY-MM-DD hh:mm:ss")
+          records.updateTime = this.$dayjs(records.updateTime).format("YYYY-MM-DD hh:mm:ss")
           this.roleInfoObject = records
         }else{
           this.$message({
@@ -135,8 +134,8 @@ export default {
         if (result.resultCode === 200){
           let data = result.data
           data.forEach((value,index,array)=>{
-            array[index].createTime = dateFormatter(array[index].createTime)
-            array[index].updateTime = dateFormatter(array[index].updateTime)
+            array[index].createTime = this.$dayjs(array[index].createTime).format("YYYY-MM-DD hh:mm:ss")
+            array[index].updateTime = this.$dayjs(array[index].updateTime).format("YYYY-MM-DD hh:mm:ss")
           })
           this.$store.commit("roleInfoAbout/setPermission",data)
         }else{

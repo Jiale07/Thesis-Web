@@ -149,7 +149,6 @@
 <script>
 import {postTeacherResume,postUpdateTeacherResume } from "../../../../axios/public/TeacherResumeAbout";
 import {mapState} from "vuex";
-// import {dateFormatter} from "../../../../util/dateFormatter";
 
 export default {
   name: "EditResume",

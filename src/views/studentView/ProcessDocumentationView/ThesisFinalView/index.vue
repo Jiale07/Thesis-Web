@@ -74,7 +74,6 @@ import {
   postThesisFinalByStudentId,
   postVerifyIsCanSubmit
 } from "../../../../axios/studentView/processDocumentation/ThesisFInalSubmitAbout";
-import {dateFormatter} from "../../../../util/dateFormatter";
 import {mapState} from "vuex";
 import {download, getFileName} from "../../../../axios/public/testView";
 
@@ -111,7 +110,7 @@ export default {
         if (res.resultCode===200){
           let data = res.data
           data.forEach(element=>{
-            element.submitTime = dateFormatter(element.submitTime)
+            element.submitTime = this.$dayjs(element.submitTime).format("YYYY-MM-DD hh:mm:ss")
           })
           _this.isHaveSubmit = false
           _this.tableData = res.data

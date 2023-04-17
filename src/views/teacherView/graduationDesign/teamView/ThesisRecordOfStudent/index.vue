@@ -57,7 +57,6 @@
 import ThesisBasicInformationComponent from "../component/ThesisBasicInformationComponent"
 import {mapState} from "vuex";
 import {postThesisSubmittedRecordList} from "../../../../../axios/teacher/GDTeamAbout/ThesisRecordOfStudentAbout";
-import {dateFormatter} from "../../../../../util/dateFormatter";
 export default {
   name: "ThesisRecordOfStudent",
   props: ['propsStudentId'],
@@ -111,7 +110,7 @@ export default {
           //结果集
           let records = res.data.records
           records.forEach(element=>{
-            element.submitTime = dateFormatter(element.submitTime)
+            element.submitTime = this.$dayjs(element.submitTime).format("YYYY-MM-DD hh:mm:ss")
           })
           this.pageInfo.tableData = records
           console.log(this.pageInfo.tableData)

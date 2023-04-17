@@ -74,7 +74,6 @@ import {
   postJoinGDTTeam,
   postTeacherTopicSelected
 } from "../../../../axios/teacher/GraduationDesignAbout/TwoWaySelectionView";
-import {dateFormatter} from "../../../../util/dateFormatter";
 import {mapState} from "vuex";
 
 export default {
@@ -131,8 +130,8 @@ export default {
           //结果集
           let tableData =  res.data.records
           tableData.forEach((value,index,array)=>{
-            array[index].selectionCreateTime = dateFormatter(array[index].selectionCreateTime)
-            array[index].selectionUpdateTime = dateFormatter(array[index].selectionUpdateTime)
+            array[index].selectionCreateTime = this.$dayjs(array[index].selectionCreateTime).format("YYYY-MM-DD hh:mm:ss")
+            array[index].selectionUpdateTime = this.$dayjs(array[index].selectionUpdateTime).format("YYYY-MM-DD hh:mm:ss")
           })
           this.pageInfo.tableData =tableData
           //最大页数

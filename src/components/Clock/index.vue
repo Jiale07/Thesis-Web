@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: "ClockComponent",
+  name: "Clock",
   data(){
     return {
       clock:{
@@ -30,7 +30,7 @@ export default {
           + this.zeroPadding(date.getMonth() + 1, 2)
           + "-"
           + this.zeroPadding(date.getDate(), 2)
-          + "-"
+          + " "
           + this.zeroPadding(this.week[date.getDay()])
       this.clock.time = this.zeroPadding(date.getHours(), 2)
           + ":"

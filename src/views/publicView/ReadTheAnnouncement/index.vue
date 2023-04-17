@@ -31,7 +31,6 @@
 
 <script>
 import { postAnnouncementById, postCreatorNameByCreatorId} from "../../../axios/public/ReadTheAnnouncement";
-import {dateFormatter} from "../../../util/dateFormatter";
 
 export default {
   name: "ReadTheAnnouncement",
@@ -80,8 +79,8 @@ export default {
           let res = result.data
           if(res.resultCode===200){
             let data = res.data
-            data.createTime = dateFormatter(data.createTime)
-            data.updateTime = dateFormatter(data.updateTime)
+            data.createTime = this.$dayjs(data.createTime).format("YYYY-MM-DD hh:mm:ss")
+            data.updateTime = this.$dayjs(data.updateTime).format("YYYY-MM-DD hh:mm:ss")
             this.Announcement = res.data
             resolve(res.data.categoryId)
           }else{

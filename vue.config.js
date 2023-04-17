@@ -16,7 +16,7 @@ module.exports = {
     },
     chainWebpack: config => {
         config.resolve.alias
-            .set("@", resolve("src"))
+          .set('@', resolve( '/src'))
         config.module
             .rule('svg')
             .exclude.add(resolve('src/assets/icons'))

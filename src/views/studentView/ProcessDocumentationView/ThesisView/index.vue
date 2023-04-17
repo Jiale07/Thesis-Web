@@ -89,7 +89,6 @@
 </template>
 
 <script>
-import {dateFormatter} from "../../../../util/dateFormatter"
 import {
   postFinalAuditResults,
   postThesisSubmitTheRecordVOPage, postVerifyIsCanSubmitOfThesis
@@ -162,7 +161,7 @@ export default {
           //结果集
           let records = res.data.records
           records.forEach(element=>{
-            element.submitTime = dateFormatter(element.submitTime)
+            element.submitTime = this.$dayjs(element.submitTime).format("YYYY-MM-DD hh:mm:ss")
           })
 
           this.pageInfo.tableData = records

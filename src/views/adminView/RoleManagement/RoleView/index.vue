@@ -58,7 +58,6 @@
 
 <script>
 import {deleteRole, getRolePage} from "../../../../axios/adminView/RoleManagement/RoleInfo";
-import {dateFormatter} from "../../../../util/dateFormatter";
 import AddRoleComponent from "./component/AddRoleComponent"
 
 export default {
@@ -103,8 +102,8 @@ export default {
           //结果集
           let records = result.data.records
           records.forEach((value,index,array)=>{
-            array[index].createTime = dateFormatter(array[index].createTime)
-            array[index].updateTime = dateFormatter(array[index].updateTime)
+            array[index].createTime = this.$dayjs(array[index].createTime).format("YYYY-MM-DD hh:mm:ss")
+            array[index].updateTime = this.$dayjs(array[index].updateTime).format("YYYY-MM-DD hh:mm:ss")
           })
           this.pageInfo.tableData = records
           //最大页数

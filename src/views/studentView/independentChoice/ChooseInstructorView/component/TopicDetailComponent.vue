@@ -32,7 +32,6 @@
 import {
   postFindTopicDetail
 } from "../../../../../axios/studentView/independentChoice/choiceInstructorView";
-import {dateFormatter} from "../../../../../util/dateFormatter";
 
 export default {
   name: "TopicDetailComponent",
@@ -67,8 +66,8 @@ export default {
         let result = res.data
         if (result.resultCode===200){
           let topicInfoDemo = result.data
-          topicInfoDemo.topicCreateTime = dateFormatter(topicInfoDemo.topicCreateTime)
-          topicInfoDemo.topicUpdateTime = dateFormatter(topicInfoDemo.topicUpdateTime)
+          topicInfoDemo.createTime = this.$dayjs(topicInfoDemo.createTime).format("YYYY-dd-MM hh-mm-ss")
+          topicInfoDemo.updateTime = this.$dayjs(topicInfoDemo.updateTime).format("YYYY-dd-MM hh-mm-ss")
           this.topicInfo = topicInfoDemo
           let _this = this
           setTimeout(function(){

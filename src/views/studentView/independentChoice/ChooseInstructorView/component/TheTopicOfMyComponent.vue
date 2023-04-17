@@ -44,7 +44,6 @@ import {
   cancelSelected,
   postSelectionTopicResult
 } from "../../../../../axios/studentView/independentChoice/choiceInstructorView";
-import {dateFormatter} from "../../../../../util/dateFormatter";
 import {mapState} from "vuex";
 
 export default {
@@ -115,8 +114,8 @@ export default {
         if (res.resultCode===200){
           let data = res.data
           let isPassedArr = this.isPassedArr
-          data.gdtscreateTime = dateFormatter(data.gdtscreateTime)
-          data.gdtsupdateTime = dateFormatter(data.gdtsupdateTime)
+          data.gdtscreateTime = this.$dayjs(data.gdtscreateTime).format("YYYY-MM-DD hh:mm:ss")
+          data.gdtsupdateTime = this.$dayjs(data.gdtsupdateTime).format("YYYY-MM-DD hh:mm:ss")
           isPassedArr.filter(element=>{
             if (data.isPassed===element.id){
              data.isPassedMessage = element.message

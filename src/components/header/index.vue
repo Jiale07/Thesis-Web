@@ -4,17 +4,15 @@
       <span class="title">
        毕业论文管理系统
       </span>
-      <span class="title">{{userTitle}}界面</span>
+      <span class="title">{{ formatTitle }}</span>
     </div>
     <div class="right">
       <el-dropdown @command="handleCommand">
         <div class="user">
           <el-image class="userIcon"></el-image>
-          <span class="userName">{{ userInfo.userName }}</span>
+          <span class="userName">{{ username }}</span>
         </div>
-        <el-dropdown-menu slot="dropdown">
-<!--          <el-dropdown-item @click="toResumeView">个人信息</el-dropdown-item>-->
-<!--          <el-dropdown-item >其他</el-dropdown-item>-->
+        <el-dropdown-menu v-slot:default>
           <el-dropdown-item command="clickLogout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -26,20 +24,39 @@
 
 export default {
   name: "Header",
-  props:['userTitle','userInfo'],
-  data(){
-    return{
+  props: {
+    title: {
+      type: String,
+      default: ''
+    },
+    userInfo: {
+      type: Object,
+      default: () => {
+        return {
+          username: 'User Name'
+        }
+      }
     }
   },
-  methods:{
-
-    handleCommand(command){
-      if(command==='clickLogout'){
+  data() {
+    return {}
+  },
+  computed: {
+    formatTitle() {
+      return `${this.title}界面`
+    },
+    username() {
+      return this.userInfo.username
+    }
+  },
+  methods: {
+    handleCommand(command) {
+      if (command === 'clickLogout') {
         this.clickLogout()
       }
     },
 
-    clickLogout(){
+    clickLogout() {
       this.$store.commit('loginAbout/logout')
       this.$router.push('/login')
     }
@@ -51,40 +68,43 @@ export default {
 </script>
 
 <style scoped lang="less">
-.titleBox{
+.titleBox {
   display: flex;
   justify-content: space-between;
   height: 60px;
   line-height: 60px;
   background-color: #3170A7;
 
-  .title{
+  .title {
     font-size: 28px;
     margin-left: 30px;
     color: #ffffff;
   }
 
-  .right{
+  .right {
     margin-right: 10px;
     display: flex;
     justify-content: flex-end;
-    .user{
+
+    .user {
       display: flex;
       justify-content: space-between;
       text-align: center;
 
-      .userIcon{
+      .userIcon {
         margin: auto 10px;
         height: 30px;
         width: 30px;
         border-radius: 50%;
       }
-      .userName{
+
+      .userName {
         margin-right: 10px;
         color: #ffffff;
       }
     }
-    .user:hover{
+
+    .user:hover {
       background-color: #2ca9e1;
     }
 

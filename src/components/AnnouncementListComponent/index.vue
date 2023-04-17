@@ -50,8 +50,8 @@ export default {
         if (resultCode === 200){
           let data = res.data
           data.forEach(element=>{
-            element.createTime = this.dateFormatterScoped(element.createTime)
-            element.updateTime = this.dateFormatterScoped(element.updateTime)
+            element.createTime = this.$dayjs(element.createTime).format("YYYY-MM-DD hh:mm:ss")
+            element.updateTime = this.$dayjs(element.updateTime).format("YYYY-MM-DD hh:mm:ss")
           })
           this.AnnouncementList = data
         }else if(resultCode===204){
