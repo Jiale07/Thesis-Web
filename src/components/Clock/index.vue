@@ -49,6 +49,7 @@ export default {
   },
 
   created() {
+    this.updateClock()
     setInterval(()=>{
       this.updateClock()
     },1000)

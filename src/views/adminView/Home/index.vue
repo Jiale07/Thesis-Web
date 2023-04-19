@@ -35,7 +35,7 @@ export default {
       asideHeight:'',
       userInfo:{
         userId:'',
-        userName:'AdminName'
+        username:'AdminName'
       }
     }
   },

@@ -1,30 +1,27 @@
 <template>
-  <div>
-    <el-container :style="{minHeight:asideHeight+'px'}">
-      <el-header height="120px">
-        <Header
-            :title="title"
-            :userInfo="userInfo"
-        ></Header>
-        <Nav :menu="menu"></Nav>
-      </el-header>
-      <el-main>
-        <div class="left">
-          <slot name="left"></slot>
-        </div>
-        <div class="right">
-          <slot name="right"></slot>
-        </div>
-      </el-main>
-      <Footer/>
-    </el-container>
+  <div class="body">
+    <div height="120px" class="header">
+      <Header
+          :title="title"
+          :userInfo="userInfo"
+      ></Header>
+      <Nav :menu="menu"></Nav>
+    </div>
+    <div class="main">
+      <div class="left">
+        <slot name="left"></slot>
+      </div>
+      <div class="right">
+        <slot name="right"></slot>
+      </div>
+    </div>
+    <Footer class="footer"></Footer>
   </div>
 </template>
 
 <script>
 import Header from "@/components/header/index.vue";
 import Nav from "@/components/student/nav/index.vue";
-import {getAsideHeight} from "@/util/tool";
 import Footer from "@/components/footer/index.vue";
 
 export default {
@@ -49,14 +46,9 @@ export default {
   },
   data() {
     return {
-      asideHeight: '',
     }
   },
   components: {Header, Nav, Footer},
-  mounted() {
-    //获取窗口高度
-    this.asideHeight = getAsideHeight()
-  },
 }
 </script>
 
@@ -82,6 +74,36 @@ export default {
   }
 
   .left {
+
+  }
+}
+
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  height: 100vh;
+
+  .header {
+
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(300px, 400px) minmax(300px, 1fr);
+    flex: 1;
+    overflow: auto;
+    .left {
+      overflow: auto;
+    }
+    .right {
+      overflow: auto;
+    }
+  }
+
+  .footer {
 
   }
 }

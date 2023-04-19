@@ -13,7 +13,15 @@
       </div>
     </template>
     <template v-slot:right>
-      123
+      <div class="summary-box">
+        <div
+            v-for="(item, index) in summaryBoxList"
+            :key="index"
+            class="container "
+        >
+          <span>{{item.label}}</span>
+        </div>
+      </div>
     </template>
   </HomeTemplate>
 </template>
@@ -86,6 +94,12 @@ export default {
         userId: '',
         username: 'student',
       },
+      summaryBoxList: [
+        {
+          key: 'thesisFlow',
+          label: '毕业论文流程',
+        },
+      ]
     }
   },
   components: {
@@ -120,4 +134,10 @@ export default {
 </script>
 <style scoped lang="less">
 @import "/src/assets/styles/css/public";
+
+.summary-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 300px);
+  grid-auto-rows: 100px;
+}
 </style>
