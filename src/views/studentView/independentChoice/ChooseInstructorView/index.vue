@@ -1,5 +1,5 @@
 <template>
-  <div class="myBady" :style="{minHeight:asideHeight+'px'}">
+  <div class="body">
     <div class="myContainer">
       <div class="myContent header">
         <el-page-header @back="goBack" content="学生选题" title="返回首页">
@@ -68,17 +68,18 @@
           <el-pagination
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
-              :current-page="currentPage"
-              :page-sizes="pageSizes"
-              :page-size="pageSize"
-              :page-count="pageCount"
+              :current-page="pageInfo.currentPage"
+              :page-sizes="pageInfo.pageSizes"
+              :page-size="pageInfo.pageSize"
+              :page-count="pageInfo.pageCount"
               layout="total, sizes, prev, pager, next, jumper"
-              :total="total"
+              :total="pageInfo.total"
               class="myPageStyle">
           </el-pagination>
         </div>
       </div>
     </div>
+
     <TopicDetailComponent
         v-if="detailsDialogVisible"
         :topic-id="currTopicId"
@@ -99,7 +100,7 @@ import {
   findStudentSelectedByStudentId,
   findTopicPage,
   selectedTopic
-} from "../../../../axios/studentView/independentChoice/choiceInstructorView";
+} from "@/axios/studentView/independentChoice/choiceInstructorView";
 import {mapState} from "vuex";
 import row from "element-ui/packages/row";
 export default {
@@ -107,7 +108,7 @@ export default {
   data() {
     return {
       topicSelectedStateInfo: '',
-      asideHeight: '',
+      // asideHeight: '',
       isPassed: true,
       emptyText: '',
       loading: true,
@@ -172,6 +173,20 @@ export default {
       ],
       detailsDialogVisible: false,
       currTopicId: '',
+
+      pageInfo:{
+        //当前页数
+        currentPage: 1,
+        total:0,
+        //每页显示条目个数
+        pageSize:10,
+        pagerCount:0,
+        //最大页数
+        pageCount:0,
+        pageSizes:[5, 10, 15, 20],
+      },
+      tableData: [],
+      collegeId: undefined
     }
   },
   components: {
@@ -183,115 +198,40 @@ export default {
     row() {
       return row
     },
-    ...mapState({pageInfo: 'choiceInstructor/pageInfo'}),
     ...mapState('loginAbout', ['user']),
-    tableData: {
-      get() {
-        return this.$store.state.choiceInstructor.pageInfo.tableData
-      },
-      set(value) {
-        this.$store.commit('choiceInstructor/setTableData', value)
-      }
-    },
-    currentPage: {
-      get() {
-        return this.$store.state.choiceInstructor.pageInfo.current_page
-      },
-      set(value) {
-        this.$store.state.choiceInstructor.pageInfo.current_page = value
-      }
-    },
-    pageSize: {
-      get() {
-        return this.$store.state.choiceInstructor.pageInfo.page_size
-      },
-      set(value) {
-        this.$store.state.choiceInstructor.pageInfo.page_size = value
-      }
-    },
-    pageSizes: {
-      get() {
-        return this.$store.state.choiceInstructor.pageInfo.page_sizes
-      },
-      set(value) {
-        this.$store.state.choiceInstructor.pageInfo.page_sizes = value
-      }
-    },
-    pageCount: {
-      get() {
-        return this.$store.state.choiceInstructor.pageInfo.page_count
-      },
-      set(value) {
-        this.$store.state.choiceInstructor.pageInfo.page_count = value
-      }
-    },
-    total: {
-      get() {
-        return this.$store.state.choiceInstructor.pageInfo.total
-      },
-      set(value) {
-        this.$store.state.choiceInstructor.pageInfo.total = value
-      }
-    },
-    CollegeId: {
-      get() {
-        return this.$store.state.choiceInstructor.searchData.collegeId
-      },
-      set(value) {
-        this.$store.commit('choiceInstructor/setSearchCollegeId', value)
-      }
-    },
   },
   methods: {
     // 返回首页
     goBack() {
       this.$router.push("/student")
     },
-    //切换页面显示条数数量
     handleSizeChange(val) {
-      this.$store.state.choiceInstructor.pageInfo.page_size = val
-      this.postTopicPage(
-        this.currentPage,
-        val,
-        this.TeacherName,
-        this.$store.state.choiceInstructor.searchData.collegeId,
-        this.CategoryId,
-        this.TopicName,)
+      this.pageInfo.pageSize = val
+      this.postTopicPage()
     },
-    //当前页切换
     handleCurrentChange(val) {
-      this.$store.state.choiceInstructor.pageInfo.current_page = val
-      this.postTopicPage(
-        val,
-        this.pageSize,
-        this.TeacherName,
-        this.$store.state.choiceInstructor.searchData.collegeId,
-        this.CategoryId,
-        this.TopicName,)
+      this.pageInfo.currentPage = val
+      this.postTopicPage()
     },
-
-    //获取题目信息及对应教师信息
-    postTopicPage(currentPage, pageSize, teacherName, collegeId, categoryId, topicName) {
-      findTopicPage({
-        currentPage,
-        pageSize,
-        teacherName,
-        collegeId,
-        categoryId,
-        topicName
-      }).then(res => {
+    postTopicPage() {
+      const params = {
+        currentPage: this.pageInfo.currentPage,
+        pageSize: this.pageInfo.pageSize,
+        teacherName: undefined,
+        collegeId: this.collegeId,
+        categoryId: undefined,
+        topicName: undefined,
+      }
+      findTopicPage(params).then(res => {
         let result = res.data
+        let {current, total, records, pages, message} = res.data.data
         if (result.resultCode === 200) {
-          //当前页数
-          this.currentPage = result.data.current
-          //总条数
-          this.total = result.data.total
-          //结果集
-          this.tableData = result.data.records
-          //最大页数
-          this.pageCount = result.data.pages
+          this.pageInfo.currentPage = current
+          this.pageInfo.total = total
+          this.tableData = records
+          this.pageInfo.pageCount = pages
         } else {
-          this.emptyText = result.message
+          this.emptyText = message
           this.tableData = []
         }
         setTimeout(() => {
@@ -362,7 +302,6 @@ export default {
         }
       })
     },
-
     // 验证是否选题
     verificationFunction() {
       findStudentSelectedByStudentId({
@@ -381,21 +320,14 @@ export default {
       switch (key) {
         case 'select': {
           if (this.topicSelectedStateInfo === '') {
-            if (row.selectionCount >= row.optionalNumber) {
-              return false
-            }
-            return true
+            return row.selectionCount < row.optionalNumber;
           } else {
             return false
           }
         }
         case 'cancel': {
           if (row.selectionCount >= row.optionalNumber) {
-            if (row.topicId === this.topicSelectedStateInfo.topicId) {
-              return false
-            } else {
-              return true
-            }
+            return row.topicId !== this.topicSelectedStateInfo.topicId;
           } else {
             return false
           }
@@ -416,10 +348,6 @@ export default {
         }
       }
     },
-
-    beAlreadySelected(row) {
-      return row.topicId === this.topicSelectedStateInfo.topicId;
-    },
     //获取学院列表
     postFindCollegeIdByStudentId() {
       findCollegeIdByStudentId({
@@ -431,7 +359,6 @@ export default {
         }
       })
     },
-
     toBrowseTeacherResume(teacherId) {
       this.$router.push({
         name: 'BrowseTeacherResume',
@@ -447,70 +374,35 @@ export default {
     changeDialogVisible() {
       this.detailsDialogVisible = !this.detailsDialogVisible
     },
-
-    // 初始化
-    initialize() {
+    async initialize() {
       this.postFindCollegeIdByStudentId()
       this.verificationFunction()
-      const p = new Promise((resolve, reject) => {
-        findCollegeIdByStudentId({
-          studentId: this.user.userId
-        }).then(result => {
-          let res = result.data
-          if (res.resultCode === 200) {
-            this.CollegeId = res.data
-            resolve(res.data)
-          } else {
-            reject(null)
-          }
-        })
+      await findCollegeIdByStudentId({
+        studentId: this.user.userId
+      }).then(result => {
+        let res = result.data
+        if (res.resultCode === 200) {
+          this.collegeId = res.data
+          this.postTopicPage()
+        } else {
+          this.$message.warning(res.message)
+        }
       })
-      p.then(value => {
-        this.postTopicPage(
-          this.currentPage,
-          this.pageSize,
-          this.TeacherName,
-          value,
-          this.CategoryId,
-          this.TopicName,)
-      }, error => {
-        this.postTopicPage(
-          this.currentPage,
-          this.pageSize,
-          this.TeacherName,
-          error,
-          this.CategoryId,
-          this.TopicName,)
-      })
-
-    }
-  },
-
-  mounted() {
-    //获取窗口高度
-    this.asideHeight = document.documentElement.clientHeight;
-    window.onresize = () => {
-      return (() => {
-        this.asideHeight = document.documentElement.clientHeight;
-      })()
     }
   },
   created() {
-
     this.initialize()
   },
-
-  beforeDestroy() {
-    this.$store.commit('choiceInstructor/emptyPageInfo')
-  }
-
 }
 </script>
 
 <style scoped lang="less">
-.myBady {
+.body {
+  display: flex;
+  height: 100vh;
 
   .myContainer {
+    flex: 1;
     margin: 0 auto;
     max-width: 1280px;
   }
@@ -552,7 +444,7 @@ export default {
     }
 
     .topicItem:last-of-type {
-      padding-bottom: 0px;
+      padding-bottom: 0;
     }
   }
 }
