@@ -1,6 +1,5 @@
 <template>
   <div>
-    <el-button size="mini" @click="showDialog(row.topicId)">详情</el-button>
     <el-dialog
         v-loading="loading"
         title="题目详情"
@@ -13,7 +12,7 @@
           <el-descriptions-item label="题目名称:">{{ topicInfo.topicName }}</el-descriptions-item>
         </el-descriptions>
         <el-descriptions :column="1">
-          <el-descriptions-item label="描述:">{{ topicInfo.topicDescription}}</el-descriptions-item>
+          <el-descriptions-item label="描述:">{{ topicInfo.topicDescription }}</el-descriptions-item>
         </el-descriptions>
         <el-descriptions :column="2">
           <el-descriptions-item label="创建时间:">{{ topicInfo.topicCreateTime }}</el-descriptions-item>
@@ -35,59 +34,61 @@ import {
 
 export default {
   name: "TopicDetailComponent",
-  props:['row'],
-  data(){
-    return {
-      dialogVisible:false,
-      detailsShow:true,
-      topicInfo:{
-        topicName:'',
-        description:'',
-        createTime:'',
-        updateTime:''
-      },
-      loading:true
+  props: {
+    topicId: {
+      type: [String, Number],
     }
   },
-  methods:{
-    //题目详情查看
-    showDialog(topicId){
-      // console.log(topicId)
-      this.postFindTopicDetail(topicId)
-      this.dialogVisible = true
-    },
-
-    // 获取毕业设计题目详细信息
-    postFindTopicDetail(topicId){
+  data() {
+    return {
+      dialogVisible: true,
+      detailsShow: true,
+      topicInfo: {
+        topicName: '',
+        description: '',
+        createTime: '',
+        updateTime: ''
+      },
+      loading: true
+    }
+  },
+  methods: {
+    initTopicDetail(topicId) {
       postFindTopicDetail({
         topicId
-      }).then(res=>{
-        console.log(res)
+      }).then(res => {
         let result = res.data
-        if (result.resultCode===200){
+        if (result.resultCode === 200) {
           let topicInfoDemo = result.data
-          topicInfoDemo.createTime = this.$dayjs(topicInfoDemo.createTime).format("YYYY-dd-MM hh-mm-ss")
-          topicInfoDemo.updateTime = this.$dayjs(topicInfoDemo.updateTime).format("YYYY-dd-MM hh-mm-ss")
+          topicInfoDemo.topicCreateTime = this.$dayjs(topicInfoDemo.topicCreateTime).format("YYYY-DD-MM hh:mm:ss")
+          topicInfoDemo.topicUpdateTime = this.$dayjs(topicInfoDemo.topicUpdateTime).format("YYYY-DD-MM hh:mm:ss")
           this.topicInfo = topicInfoDemo
           let _this = this
-          setTimeout(function(){
+          setTimeout(function () {
             _this.detailsShow = false
             _this.loading = false
-          },300)
-        }else{
+          }, 300)
+        } else {
           this.$message({
-            type:'error',
-            message:result.message
+            type: 'error',
+            message: result.message
           })
         }
       })
     },
-
-    //毕业设计题目详情关闭前方法
-    handleClose(){
+    handleClose() {
       this.dialogVisible = false
+      this.$emit('change-dialog-visible')
       this.detailsShow = true
     },
+  },
+  created() {
+    if (this.topicId) {
+      this.initTopicDetail(this.topicId)
+    } else {
+      this.loading = false
+      this.detailsShow = false
+    }
   }
 }
 </script>

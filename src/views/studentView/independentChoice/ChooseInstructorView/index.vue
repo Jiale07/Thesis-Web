@@ -20,65 +20,45 @@
               :empty-text="emptyText"
               v-loading="loading"
               stripe
-              slot="empty"
+              @row-click="handleTableRowClick($event)"
               style="width: 100%">
             <el-table-column
-                prop="topicName"
-                label="题目名称"
-                width="420">
-            </el-table-column>
-            <el-table-column
-                label="可选被选数量"
-                prop="optionalNumber">
-            </el-table-column>
-            <el-table-column
-                label="已经被选数量"
-                prop="selectionCount">
-            </el-table-column>
-            <el-table-column
-                label="教师名称">
+                v-for="(item, index) in tableColumnList"
+                :key="`${item.prop}-${index}`"
+                v-bind="item"
+            >
               <template slot-scope="scope">
-                <el-tooltip class="item" effect="dark" content="点击查看教师简介" placement="top">
-                  <span @click="toBrowseTeacherResume(scope.row.teacherId)">
-                    {{scope.row.teacherName}}
-                  </span>
-                </el-tooltip>
+                <div
+                    v-if="item.isTooltip"
+                >
+                  <el-tooltip class="item" v-bind="item.tooltipConfig">
+                    <span
+                        @click="item.clickFunction(scope.row.teacherId)"
+                        :style="{cursor: 'pointer'}"
+                    >
+                      {{ scope.row[item.prop] }}
+                    </span>
+                  </el-tooltip>
+                </div>
+                <div v-else>
+                  <span>{{ scope.row[item.prop] }}</span>
+                </div>
               </template>
-            </el-table-column>
-            <el-table-column
-                label="教师所属学院"
-                prop="collegeName">
             </el-table-column>
             <el-table-column>
               <template slot-scope="scope">
-                <div class="buttonBox" v-if="isPassed">
-                  <TopicDetailComponent
-                      :row="scope.row"
+                <div class="buttonBox">
+                  <el-button
+                      v-for="(item, index) in operationList"
+                      :key="`${item.key}-${index}`"
+                      :size="item.buttonSize"
+                      :type="item.buttonType"
+                      :disabled="item.disabled"
+                      v-show="handleOperationShow(scope.row, item.key)"
+                      @click="item.handleClick(scope.row)"
                   >
-                  </TopicDetailComponent>
-                  <el-button
-                      size="mini"
-                      type="primary"
-                      @click="selectedIt(scope.row)"
-                      v-show="selectFunction(scope.row)"
-                  >选中</el-button>
-                  <el-button
-                      v-show="beAlreadySelected(scope.row)"
-                      size="mini"
-                      type="danger"
-                      @click="cancelSelectedFunction(scope.row)"
-                  >取消</el-button>
-                  <el-button
-                      size="mini"
-                      disabled
-                      v-show="beAlreadyFull(scope.row)"
-                  >已满</el-button>
-                  <el-button
-                      size="mini"
-                      type="warning"
-                      @click="changeSelectedFunction(topicSelectedStateInfo,scope.row)"
-                      v-show="beChangeSelected(scope.row)"
-                  >改选</el-button>
+                    <span>{{ item.label }}</span>
+                  </el-button>
                 </div>
               </template>
             </el-table-column>
@@ -99,6 +79,12 @@
         </div>
       </div>
     </div>
+    <TopicDetailComponent
+        v-if="detailsDialogVisible"
+        :topic-id="currTopicId"
+        @change-dialog-visible="changeDialogVisible"
+    >
+    </TopicDetailComponent>
   </div>
 </template>
 
@@ -115,87 +101,148 @@ import {
   selectedTopic
 } from "../../../../axios/studentView/independentChoice/choiceInstructorView";
 import {mapState} from "vuex";
+import row from "element-ui/packages/row";
 export default {
   name: "ChooseInstructor",
-  data(){
+  data() {
     return {
-      selectionLoading:false,
-      is_selected:false,
-      topicSelectedStateInfo:'',
-      asideHeight:'',
-      topicSelectedCount:0,
-      empty:'没有更多题目信息',
-      isPassed:true,
-      emptyText:'',
-      loading:true
+      topicSelectedStateInfo: '',
+      asideHeight: '',
+      isPassed: true,
+      emptyText: '',
+      loading: true,
+
+      tableColumnList: [
+        {
+          prop: 'topicName',
+          label: '题目名称',
+          width: '420',
+        },
+        {
+          prop: 'optionalNumber',
+          label: '可选被选数量',
+        },
+        {
+          prop: 'selectionCount',
+          label: '已经被选数量',
+        },
+        {
+          prop: 'teacherName',
+          label: '导师名称',
+          clickFunction: this.toBrowseTeacherResume,
+          isTooltip: true,
+          tooltipConfig: {
+            content: "点击查看教师简介",
+            placement: 'top',
+            effect: 'dark'
+          }
+        },
+        {
+          prop: 'collegeName',
+          label: '教师所属学院',
+        }
+      ],
+      operationList: [
+        {
+          key: 'select',
+          label: '选中',
+          isButton: true,
+          buttonSize: 'mini',
+          buttonType: 'primary',
+          disabled: false,
+          handleClick: this.selectedIt
+        },
+        {
+          key: 'cancel',
+          label: '取消',
+          isButton: true,
+          buttonSize: 'mini',
+          buttonType: 'danger',
+          disabled: false,
+          handleClick: this.cancelSelectedFunction
+        }, {
+          key: 'changeSelect',
+          label: '改选',
+          isButton: true,
+          buttonSize: 'mini',
+          buttonType: 'warning',
+          disabled: false,
+          handleClick: this.changeSelectedFunction
+        }
+      ],
+      detailsDialogVisible: false,
+      currTopicId: '',
     }
   },
-  components:{
+  components: {
     SearchComponent,
     TopicDetailComponent,
     TheTopicOfMyComponent
   },
-  computed:{
-    ...mapState({pageInfo:'choiceInstructor/pageInfo'}),
-    ...mapState('loginAbout',['user']),
-    tableData:{
-      get(){
+  computed: {
+    row() {
+      return row
+    },
+    ...mapState({pageInfo: 'choiceInstructor/pageInfo'}),
+    ...mapState('loginAbout', ['user']),
+    tableData: {
+      get() {
         return this.$store.state.choiceInstructor.pageInfo.tableData
       },
-      set(value){
-        this.$store.commit('choiceInstructor/setTableData',value)
+      set(value) {
+        this.$store.commit('choiceInstructor/setTableData', value)
       }
     },
-    currentPage:{
-      get(){
+    currentPage: {
+      get() {
         return this.$store.state.choiceInstructor.pageInfo.current_page
       },
-      set(value){
+      set(value) {
         this.$store.state.choiceInstructor.pageInfo.current_page = value
       }
     },
-    pageSize:{
-      get(){
+    pageSize: {
+      get() {
         return this.$store.state.choiceInstructor.pageInfo.page_size
       },
-      set(value){
+      set(value) {
         this.$store.state.choiceInstructor.pageInfo.page_size = value
       }
     },
-    pageSizes:{
-      get(){
+    pageSizes: {
+      get() {
         return this.$store.state.choiceInstructor.pageInfo.page_sizes
       },
-      set(value){
+      set(value) {
         this.$store.state.choiceInstructor.pageInfo.page_sizes = value
       }
     },
-    pageCount:{
-      get(){
+    pageCount: {
+      get() {
         return this.$store.state.choiceInstructor.pageInfo.page_count
       },
-      set(value){
+      set(value) {
         this.$store.state.choiceInstructor.pageInfo.page_count = value
       }
     },
-    total:{
-      get(){
+    total: {
+      get() {
         return this.$store.state.choiceInstructor.pageInfo.total
       },
-      set(value){
+      set(value) {
         this.$store.state.choiceInstructor.pageInfo.total = value
       }
     },
-    CollegeId:{
-      get(){
+    CollegeId: {
+      get() {
         return this.$store.state.choiceInstructor.searchData.collegeId
       },
-      set(value){
-        this.$store.commit('choiceInstructor/setSearchCollegeId',value)
+      set(value) {
+        this.$store.commit('choiceInstructor/setSearchCollegeId', value)
       }
     },
   },
-  methods:{
+  methods: {
     // 返回首页
     goBack() {
       this.$router.push("/student")
@@ -204,27 +251,27 @@ export default {
     handleSizeChange(val) {
       this.$store.state.choiceInstructor.pageInfo.page_size = val
       this.postTopicPage(
-          this.currentPage,
-          val,
-          this.TeacherName,
-          this.$store.state.choiceInstructor.searchData.collegeId,
-          this.CategoryId,
-          this.TopicName,)
+        this.currentPage,
+        val,
+        this.TeacherName,
+        this.$store.state.choiceInstructor.searchData.collegeId,
+        this.CategoryId,
+        this.TopicName,)
     },
     //当前页切换
     handleCurrentChange(val) {
       this.$store.state.choiceInstructor.pageInfo.current_page = val
       this.postTopicPage(
-          val,
-          this.pageSize,
-          this.TeacherName,
-          this.$store.state.choiceInstructor.searchData.collegeId,
-          this.CategoryId,
-          this.TopicName,)
+        val,
+        this.pageSize,
+        this.TeacherName,
+        this.$store.state.choiceInstructor.searchData.collegeId,
+        this.CategoryId,
+        this.TopicName,)
     },
 
     //获取题目信息及对应教师信息
-    postTopicPage(currentPage, pageSize, teacherName,collegeId, categoryId, topicName){
+    postTopicPage(currentPage, pageSize, teacherName, collegeId, categoryId, topicName) {
       findTopicPage({
         currentPage,
         pageSize,
@@ -232,9 +279,9 @@ export default {
         collegeId,
         categoryId,
         topicName
-      }).then(res=>{
+      }).then(res => {
         let result = res.data
-        if (result.resultCode===200){
+        if (result.resultCode === 200) {
           //当前页数
           this.currentPage = result.data.current
           //总条数
@@ -243,73 +290,73 @@ export default {
           this.tableData = result.data.records
           //最大页数
           this.pageCount = result.data.pages
-        }else{
+        } else {
           this.emptyText = result.message
           this.tableData = []
         }
-        setTimeout(()=>{
+        setTimeout(() => {
           this.loading = false
-        },0)
+        }, 0)
       })
     },
     //选中毕业设计课题
-    selectedIt(row){
+    selectedIt(row) {
       selectedTopic({
-        studentId:this.user.userId,
-        topicId:row.topicId
-      }).then(res=>{
+        studentId: this.user.userId,
+        topicId: row.topicId
+      }).then(res => {
         let result = res.data
-        if (result.resultCode===200){
+        if (result.resultCode === 200) {
           this.$message({
-            type:'success',
+            type: 'success',
             message: result.message
           })
           this.$router.go(0)
-        }else{
+        } else {
           this.$message({
-            type:'error',
+            type: 'error',
             message: result.message
           })
         }
       })
     },
     // 改选毕业设计题目
-    changeSelectedFunction(topicSelectedStateInfo,row){
+    changeSelectedFunction(topicSelectedStateInfo, row) {
       changeSelected({
-        studentId:this.user.userId,
-        newTopicId:row.topicId,
-      }).then(res=>{
+        studentId: this.user.userId,
+        newTopicId: row.topicId,
+      }).then(res => {
         let result = res.data
-        if (result.resultCode===200){
+        if (result.resultCode === 200) {
           this.$message({
-            type:'success',
+            type: 'success',
             message: result.message
           })
           this.$router.go(0)
-        }else{
+        } else {
           this.$message({
-            type:'error',
+            type: 'error',
             message: result.message
           })
         }
       })
     },
     // 取消选中已选中的毕业设计题目
-    cancelSelectedFunction(row){
+    cancelSelectedFunction(row) {
       cancelSelected({
-        studentId:this.user.userId,
-        topicId:row.topicId
-      }).then(res=>{
+        studentId: this.user.userId,
+        topicId: row.topicId
+      }).then(res => {
         let result = res.data
-        if (result.resultCode===200){
+        if (result.resultCode === 200) {
           this.$message({
-            type:'success',
+            type: 'success',
             message: result.message
           })
           this.$router.go(0)
-        }else{
+        } else {
           this.$message({
-            type:'error',
+            type: 'error',
             message: result.message
           })
         }
@@ -317,109 +364,123 @@ export default {
     },
 
     // 验证是否选题
-    verificationFunction(){
-        findStudentSelectedByStudentId({
-          studentId:this.user.userId
-        }).then(res=>{
-          let result = res.data
-          if (result.data!==null){
-            this.topicSelectedStateInfo = result.data
-            if (result.data.isPassed===1 ){
-              this.isPassed = false
-            }
+    verificationFunction() {
+      findStudentSelectedByStudentId({
+        studentId: this.user.userId
+      }).then(res => {
+        let result = res.data
+        if (result.data !== null) {
+          this.topicSelectedStateInfo = result.data
+          if (result.data.isPassed === 1) {
+            this.isPassed = false
           }
+        }
       })
     },
+    handleOperationShow(row, key) {
+      switch (key) {
+        case 'select': {
+          if (this.topicSelectedStateInfo === '') {
+            if (row.selectionCount >= row.optionalNumber) {
+              return false
+            }
+            return true
+          } else {
+            return false
+          }
+        }
+        case 'cancel': {
+          if (row.selectionCount >= row.optionalNumber) {
+            if (row.topicId === this.topicSelectedStateInfo.topicId) {
+              return false
+            } else {
+              return true
+            }
+          } else {
+            return false
+          }
+        }
+        case 'changeSelect': {
+          if (this.topicSelectedStateInfo !== '') {
+            if (row.topicId === this.topicSelectedStateInfo.topicId) {
+              return false
+            } else {
+              return row.selectionCount < row.optionalNumber;
+            }
+          } else {
+            return false
+          }
+        }
+        default: {
+          return false
+        }
+      }
+    },
 
-    selectFunction(row){
-      if (this.topicSelectedStateInfo===''){
-        if (row.selectionCount>=row.optionalNumber){
-          return false
-        }
-        return true
-      }else{
-        return false
-      }
-    },
-    beAlreadyFull(row){
-      if (row.selectionCount>=row.optionalNumber){
-        if(row.topicId === this.topicSelectedStateInfo.topicId){
-          return false
-        }else{
-          return true
-        }
-      }else{
-        return false
-      }
-    },
-    beChangeSelected(row){
-      if(this.topicSelectedStateInfo !== ''){
-        if (row.topicId === this.topicSelectedStateInfo.topicId){
-          return false
-        }else{
-          return row.selectionCount<row.optionalNumber;
-        }
-      }else{
-        return false
-      }
-    },
-    beAlreadySelected(row){
+    beAlreadySelected(row) {
       return row.topicId === this.topicSelectedStateInfo.topicId;
     },
     //获取学院列表
-    postFindCollegeIdByStudentId(){
+    postFindCollegeIdByStudentId() {
       findCollegeIdByStudentId({
-        studentId:this.user.userId
-      }).then(result=>{
+        studentId: this.user.userId
+      }).then(result => {
         let res = result.data
-        if (res.resultCode===200){
+        if (res.resultCode === 200) {
           this.CollegeId = res.data
         }
       })
     },
 
-    toBrowseTeacherResume(teacherId){
+    toBrowseTeacherResume(teacherId) {
       this.$router.push({
-        name:'BrowseTeacherResume',
-        params:{
-          'teacherId':teacherId
+        name: 'BrowseTeacherResume',
+        params: {
+          'teacherId': teacherId
         }
       })
     },
+    handleTableRowClick({topicId}) {
+      this.currTopicId = topicId
+      this.changeDialogVisible()
+    },
+    changeDialogVisible() {
+      this.detailsDialogVisible = !this.detailsDialogVisible
+    },
 
     // 初始化
-    initialize(){
+    initialize() {
       this.postFindCollegeIdByStudentId()
       this.verificationFunction()
-      const p = new Promise((resolve, reject)=>{
+      const p = new Promise((resolve, reject) => {
         findCollegeIdByStudentId({
-          studentId:this.user.userId
-        }).then(result=>{
+          studentId: this.user.userId
+        }).then(result => {
           let res = result.data
-          if (res.resultCode===200){
+          if (res.resultCode === 200) {
             this.CollegeId = res.data
             resolve(res.data)
-          }else{
+          } else {
             reject(null)
           }
         })
       })
       p.then(value => {
         this.postTopicPage(
-            this.currentPage,
-            this.pageSize,
-            this.TeacherName,
-            value,
-            this.CategoryId,
-            this.TopicName,)
-      },error => {
+          this.currentPage,
+          this.pageSize,
+          this.TeacherName,
+          value,
+          this.CategoryId,
+          this.TopicName,)
+      }, error => {
         this.postTopicPage(
-            this.currentPage,
-            this.pageSize,
-            this.TeacherName,
-            error,
-            this.CategoryId,
-            this.TopicName,)
+          this.currentPage,
+          this.pageSize,
+          this.TeacherName,
+          error,
+          this.CategoryId,
+          this.TopicName,)
       })
 
     }
@@ -436,10 +497,10 @@ export default {
   },
   created() {
 
-      this.initialize()
+    this.initialize()
   },
 
-  beforeDestroy(){
+  beforeDestroy() {
     this.$store.commit('choiceInstructor/emptyPageInfo')
   }
 
@@ -447,60 +508,60 @@ export default {
 </script>
 
 <style scoped lang="less">
-.myBady{
+.myBady {
 
-  .myContainer{
+  .myContainer {
     margin: 0 auto;
     max-width: 1280px;
   }
 }
 
-.el-page-header{
+.el-page-header {
 
 }
 
-.myContent{
+.myContent {
   padding: 20px 10px;
   background-color: #ffffff;
   border-radius: 15px;
 
 }
 
-.header{
+.header {
   margin-bottom: 10px;
 }
 
-.myPageStyle{
+.myPageStyle {
   padding-top: 10px;
   text-align: center;
 }
 
-.resultMain{
-  .buttonBox{
+.resultMain {
+  .buttonBox {
     display: flex;
     justify-content: space-around;
   }
 
-  .item{
+  .item {
     margin-bottom: 15px;
 
-    .topicItem{
+    .topicItem {
       padding: 5px 0;
       display: flex;
       justify-content: space-between;
     }
 
-    .topicItem:last-of-type{
+    .topicItem:last-of-type {
       padding-bottom: 0px;
     }
   }
 }
 
 
-.textBox{
+.textBox {
   padding: 10px;
 
-  .myLabel{
+  .myLabel {
     margin-right: 10px;
   }
 }
