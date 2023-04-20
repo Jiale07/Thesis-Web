@@ -1,13 +1,12 @@
 <template>
   <div>
     <el-dialog
-        v-loading="loading"
         title="题目详情"
         :visible.sync="dialogVisible"
         width="35%"
         :before-close="handleClose">
       <el-skeleton :rows="4" animated v-show="detailsShow"/>
-      <div v-show="!detailsShow">
+      <div v-show="!detailsShow" v-loading="loading">
         <el-descriptions :column="1">
           <el-descriptions-item label="题目名称:">{{ topicInfo.topicName }}</el-descriptions-item>
         </el-descriptions>

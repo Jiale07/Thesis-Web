@@ -47,7 +47,7 @@
             </el-table-column>
             <el-table-column>
               <template slot-scope="scope">
-                <div class="buttonBox">
+                <div class="buttonBox" v-if="isPassed">
                   <el-button
                       v-for="(item, index) in operationList"
                       :key="`${item.key}-${index}`"
