@@ -14,6 +14,7 @@ import 'quill/dist/quill.bubble.css'
 import VXETable from 'vxe-table';
 import 'vxe-table/lib/style.css';
 import dayjs from "dayjs";
+import '@/components/public/selectFormType/index.js'
 Vue.use(VueQuillEditor)
 Vue.use(ElementUI);
 Vue.use(VXETable);

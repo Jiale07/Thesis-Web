@@ -197,6 +197,18 @@ const admin = {
                 role: '1000',
                 requiresAuth: true,
             }
+        }, {
+            path: '/admin/customForm',
+            name: 'CustomForm',
+            component: () => import("@/views/adminView/customForm")
+        }, {
+            path: '/admin/customForm/create',
+            name: 'CreateCustomForm',
+            component: () => import("@/views/adminView/customForm/createCustomForm.vue")
+        }, {
+            path: '/admin/customForm/formTypeManage',
+            name: 'CustomFormTypeManage',
+            component: () => import("@/views/adminView/customForm/customFormTypeManagement.vue")
         }
     ]
 }

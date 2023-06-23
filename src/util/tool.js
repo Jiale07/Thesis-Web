@@ -9,6 +9,22 @@ function getAsideHeight() {
   return asideHeight
 }
 
+/*
+  防抖
+ */
+function debounce(fn, delay) {
+  let timer = null;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+      fn.apply(context, args);
+    }, delay);
+  };
+}
+
 export {
-  getAsideHeight
+  getAsideHeight,
+  debounce
 }

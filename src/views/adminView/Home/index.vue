@@ -23,7 +23,7 @@
 import Header from '../../../components/header/index'
 
 import NavLeft from './component/NavLeft/index'
-import {postAdminInfo} from "../../../axios/adminView/homeView";
+import {postAdminInfo} from "@/axios/adminView/homeView";
 import {mapState} from "vuex";
 
 
@@ -79,7 +79,7 @@ export default {
 
 .myContainer{
   position: sticky;
-  top:0px;
+  top:0;
 }
 .myAside{
 
