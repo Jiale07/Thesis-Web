@@ -7,7 +7,6 @@ const topicView = {
     },
     mutations:{
         setTopicDetailsTopicId(state,topicId){
-            console.log(topicId)
             state.topicDetails.topicId = topicId
         }
     },

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="nav-left-box">
     <el-menu
         default-active="2"
         class="el-menu-vertical-demo"
@@ -169,6 +169,9 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="less">
+.nav-left-box {
+  min-width: 200px;
+  background-color: #f5f7fa;
+}
 </style>

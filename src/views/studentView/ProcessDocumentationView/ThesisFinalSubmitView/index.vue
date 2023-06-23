@@ -1,10 +1,7 @@
 <template>
   <div :style="{minHeight:asideHeight+'px'}">
     <div class="myContainer">
-      <div class="myContent headerBox">
-        <el-page-header @back="goBack" content="毕业论文" class="header">
-        </el-page-header>
-      </div>
+      <HeaderComponent title="毕业论文"/>
       <div v-loading="loading" class="myContent">
         <div v-if="isHaveSubmitted">
           <div>
@@ -83,14 +80,15 @@
 <script>
 
 
-import ThesisBasicInformationComponent from "../component/ThesisBasicInformationComponent";
-import {getThesisInputSettingList} from "../../../../axios/studentView/processDocumentation/ThesisSubmitAbout";
-import {postDeletedFileLogic} from "../../../../axios/studentView/processDocumentation/ThesisProposal";
+import ThesisBasicInformationComponent from "../components/ThesisBasicInformationComponent.vue";
+import {getThesisInputSettingList} from "@/axios/studentView/processDocumentation/ThesisSubmitAbout";
+import {postDeletedFileLogic} from "@/axios/studentView/processDocumentation/ThesisProposal";
 import {
   postThesisFinalSubmit,
   postVerifyHaveSubmitted
-} from "../../../../axios/studentView/processDocumentation/ThesisFInalSubmitAbout";
+} from "@/axios/studentView/processDocumentation/ThesisFInalSubmitAbout";
 import {mapState} from "vuex";
+import HeaderComponent from "@/views/studentView/ProcessDocumentationView/components/header.vue";
 
 export default {
   name: "ThesisFinalSubmitView",
@@ -139,6 +137,7 @@ export default {
     ...mapState('loginAbout',['user','token'])
   },
   components:{
+    HeaderComponent,
     ThesisBasicInformationComponent
   },
   methods:{
@@ -190,7 +189,7 @@ export default {
     },
 
     beforeRemove(file){
-      const p = new Promise((resolve,reject)=>{
+      return new Promise((resolve, reject) => {
         this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -198,19 +197,19 @@ export default {
         }).then(() => {
           console.log(file)
           postDeletedFileLogic({
-            fileId:file.response.data.id
-          }).then(result=>{
+            fileId: file.response.data.id
+          }).then(result => {
             let res = result.data
-            if(res.resultCode===200){
+            if (res.resultCode === 200) {
               this.$message({
-                type:'success',
-                message:res.message
+                type: 'success',
+                message: res.message
               })
               resolve(true)
-            }else{
+            } else {
               this.$message({
-                type:'error',
-                message:res.message
+                type: 'error',
+                message: res.message
               })
               reject(false)
             }
@@ -223,13 +222,11 @@ export default {
           reject(false)
         });
       })
-      return p
     },
     handleRemove() {
 
     },
     handlePreview(file) {
-      console.log(1)
       console.log(file);
     },
     handleExceed(){

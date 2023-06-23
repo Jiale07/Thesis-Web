@@ -12,7 +12,7 @@
 import {
   postStudentInfoById,
   postTeacherInfoOfInstructorById
-} from "../../../../../axios/studentView/processDocumentation/ThesisProposal";
+} from "@/axios/studentView/processDocumentation/ThesisProposal";
 
 export default {
   name: "BasicInformation",

@@ -1,12 +1,7 @@
 <template>
   <div class="myContainer" :style="{minHeight:asideHeight+'px'}">
-    <div class="myContent headerBox">
-      <el-page-header @back="goBack" content="毕业论文" class="header">
-      </el-page-header>
-    </div>
-
+    <HeaderComponent title="毕业论文"/>
     <div class="myContent">
-
       <ThesisBasicInformationComponent
           :studentId="studentId"
       >
@@ -17,12 +12,12 @@
           v-for="(item,key) in ThesisInputSetting"
           :key="item.id+key">
         <div class="titleBox">
-          <span class="title">{{item.titleName}}</span>
+          <span class="title">{{ item.titleName }}</span>
         </div>
         <div>
           <div class="ql-container ql-snow" :style="{minHeight:120+'px'}">
             <div class="ql-editor">
-              <div class="details_box"  v-html="item.inputContent"/>
+              <div class="details_box" v-html="item.inputContent"/>
             </div>
           </div>
         </div>
@@ -32,18 +27,18 @@
         <div>
           <i class="el-icon-user-solid"></i>
           <span>指导老师：</span>
-          <span>{{ThesisAuditRecord.teacherName}}</span>
+          <span>{{ ThesisAuditRecord.teacherName }}</span>
         </div>
         <div>
           <i class="el-icon-finished"></i>
           <span>审核结果：</span>
-          <span>{{ThesisAuditRecord.auditStatusName}}</span>
+          <span>{{ ThesisAuditRecord.auditStatusName }}</span>
         </div>
         <div>
           <span>意见或建议：</span>
           <div class="ql-container ql-snow" :style="{minHeight:120+'px'}">
             <div class="ql-editor">
-              <div class="details_box"  v-html="ThesisAuditRecord.content"/>
+              <div class="details_box" v-html="ThesisAuditRecord.content"/>
             </div>
           </div>
         </div>
@@ -54,66 +49,66 @@
 </template>
 
 <script>
-import ThesisBasicInformationComponent from '../component/ThesisBasicInformationComponent'
+import ThesisBasicInformationComponent from '../components/ThesisBasicInformationComponent.vue'
 
 import {mapState} from "vuex";
 import {
   getThesisInputSettingList, postThesisAuditRecordByThesisId,
   postThesisInputListByThesisId
-} from "../../../../axios/studentView/processDocumentation/ThesisDetailViewAbout";
+} from "@/axios/studentView/processDocumentation/ThesisDetailViewAbout";
+import HeaderComponent from "@/views/studentView/ProcessDocumentationView/components/header.vue";
+
 export default {
   name: "ThesisDetailView",
-  props:['propsThesisId'],
-  data(){
+  props: ['propsThesisId'],
+  data() {
     return {
-      asideHeight:'',
+      asideHeight: '',
 
-      studentId:'',
+      studentId: '',
 
-      ThesisInputSetting:[],
-      ThesisAuditRecord:{},
+      ThesisInputSetting: [],
+      ThesisAuditRecord: {},
     }
   },
-  computed:{
-    ...mapState('thesisDetailViewStore',['thesisId']),
-    ...mapState('loginAbout',['user'])
+  computed: {
+    ...mapState('thesisDetailViewStore', ['thesisId']),
+    ...mapState('loginAbout', ['user'])
   },
-  components:{
+  components: {
+    HeaderComponent,
     ThesisBasicInformationComponent
   },
 
-  methods:{
-    goBack(){
-      this.$router.go(-1)
-    },
-    initialization(gdThesisId){
-      let p = new Promise((resolve,reject)=>{
-        postThesisInputListByThesisId({gdThesisId}).then(result=>{
+  methods: {
+    initialization(gdThesisId) {
+      let p = new Promise((resolve, reject) => {
+        postThesisInputListByThesisId({gdThesisId}).then(result => {
           let res = result.data
-          if (res.resultCode===200){
+          if (res.resultCode === 200) {
             resolve(res.data)
-          }else{
+          } else {
             reject()
           }
         })
       })
 
-      p.then(value=>{
+      p.then(value => {
         this.getThesisInputSettingList(value)
-      },error=>{
+      }, error => {
         this.getThesisInputSettingList(error)
       })
     },
 
-    getThesisInputSettingList(ThesisInputList){
-      getThesisInputSettingList().then(result=>{
+    getThesisInputSettingList(ThesisInputList) {
+      getThesisInputSettingList().then(result => {
         let res = result.data
-        if (res.resultCode===200){
+        if (res.resultCode === 200) {
           let data = res.data
-          data.forEach(DElement=>{
-            if (ThesisInputList!=null && ThesisInputList!=='' && ThesisInputList!==undefined){
-              ThesisInputList.forEach(listElement=>{
-                if (DElement.id===listElement.gdthesisInputSettingId){
+          data.forEach(DElement => {
+            if (ThesisInputList != null && ThesisInputList !== '' && ThesisInputList !== undefined) {
+              ThesisInputList.forEach(listElement => {
+                if (DElement.id === listElement.gdthesisInputSettingId) {
                   DElement.inputContent = listElement.inputContent
                 }
               })
@@ -124,12 +119,12 @@ export default {
       })
     },
 
-    postThesisAuditRecordByThesisId(gdThesisId){
+    postThesisAuditRecordByThesisId(gdThesisId) {
       postThesisAuditRecordByThesisId({
         gdThesisId
-      }).then(result=>{
+      }).then(result => {
         let res = result.data
-        if (res.resultCode===200){
+        if (res.resultCode === 200) {
           this.ThesisAuditRecord = res.data
         }
       })
@@ -138,8 +133,8 @@ export default {
 
   created() {
     this.studentId = this.user.userId
-    if (this.propsThesisId!=='' && this.propsThesisId!==null && this.propsThesisId!==undefined){
-      this.$store.commit("thesisDetailViewStore/setThesisId",this.propsThesisId)
+    if (this.propsThesisId !== '' && this.propsThesisId !== null && this.propsThesisId !== undefined) {
+      this.$store.commit("thesisDetailViewStore/setThesisId", this.propsThesisId)
     }
     this.postThesisAuditRecordByThesisId(this.thesisId)
     this.initialization(this.thesisId)
@@ -167,16 +162,16 @@ export default {
     padding: 15px 25px;
 
 
-
-    .mainContentItemBox{
+    .mainContentItemBox {
       margin-bottom: 20px;
     }
-    .titleBox{
+
+    .titleBox {
       line-height: 30px;
     }
   }
 
-  .headerBox{
+  .headerBox {
     margin-bottom: 10px;
   }
 }

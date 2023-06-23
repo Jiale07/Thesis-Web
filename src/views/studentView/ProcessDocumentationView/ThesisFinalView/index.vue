@@ -1,10 +1,7 @@
 <template>
   <div :style="{minHeight:asideHeight+'px'}">
     <div class="myContainer">
-      <div class="myContent headerBox">
-        <el-page-header @back="goBack" content="毕业论文" class="header">
-        </el-page-header>
-      </div>
+      <HeaderComponent title="毕业论文(最终版)"/>
       <div v-if="isCanSubmit" class="myContent">
         <div>
           <ThesisBasicInformationComponent
@@ -69,13 +66,14 @@
 </template>
 
 <script>
-import ThesisBasicInformationComponent from "../component/ThesisBasicInformationComponent";
+import ThesisBasicInformationComponent from "../components/ThesisBasicInformationComponent.vue";
 import {
   postThesisFinalByStudentId,
   postVerifyIsCanSubmit
-} from "../../../../axios/studentView/processDocumentation/ThesisFInalSubmitAbout";
+} from "@/axios/studentView/processDocumentation/ThesisFInalSubmitAbout";
 import {mapState} from "vuex";
-import {download, getFileName} from "../../../../axios/public/testView";
+import {download, getFileName} from "@/axios/public/testView";
+import HeaderComponent from "@/views/studentView/ProcessDocumentationView/components/header.vue";
 
 export default {
   name: "ThesisFinalView",
@@ -177,6 +175,7 @@ export default {
     }
   },
   components:{
+    HeaderComponent,
     ThesisBasicInformationComponent
   },
   created() {

@@ -2,10 +2,7 @@
   <div :style="{minHeight:asideHeight+'px'}">
     <div class="myBoby">
       <div class="myContainer">
-        <div class="myContent headerBox">
-          <el-page-header @back="goBack" content="开题报告" class="header">
-          </el-page-header>
-        </div>
+        <HeaderComponent title="毕业论文"/>
       </div>
       <div v-if="isJoinGDTeam.isJoin" class="myContainer">
         <div class="myContent">
@@ -164,7 +161,7 @@
 </template>
 
 <script>
-import {getTopicCategoryList} from "../../../../axios/public/GDTopicCategoyrAbout";
+import {getTopicCategoryList} from "@/axios/public/GDTopicCategoyrAbout";
 import {
   deletedThesisProposalLogic,
   getThesisProposalInputSettingList,
@@ -177,10 +174,11 @@ import {
   postTPInputListByTPId,
   postVerifyJoinGDTeam,
   postVerifyTheThesisProposalIsAudit
-} from "../../../../axios/studentView/processDocumentation/ThesisProposal";
+} from "@/axios/studentView/processDocumentation/ThesisProposal";
 import {mapState} from "vuex";
-import {postAuditStatusCategoryList} from "../../../../axios/public/AuditStatusCategoryAbout";
+import {postAuditStatusCategoryList} from "@/axios/public/AuditStatusCategoryAbout";
 import BasicInformation from "./component/BasicInformation"
+import HeaderComponent from "@/views/studentView/ProcessDocumentationView/components/header.vue";
 
 export default {
   name: "ThesisProposalView",
@@ -241,6 +239,7 @@ export default {
     ...mapState('loginAbout',['user','token'])
   },
   components:{
+    HeaderComponent,
     BasicInformation
   },
   methods:{
@@ -345,26 +344,26 @@ export default {
     },
 
     beforeRemove(file){
-      let p = new Promise((resolve,reject)=>{
+      return new Promise((resolve, reject) => {
         this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           postDeletedFileLogic({
-            fileId:file.fileId
-          }).then(result=>{
+            fileId: file.fileId
+          }).then(result => {
             let res = result.data
-            if(res.resultCode===200){
+            if (res.resultCode === 200) {
               this.$message({
-                type:'success',
-                message:res.message
+                type: 'success',
+                message: res.message
               })
               resolve(true)
-            }else{
+            } else {
               this.$message({
-                type:'error',
-                message:res.message
+                type: 'error',
+                message: res.message
               })
               reject(false)
             }
@@ -377,7 +376,6 @@ export default {
           reject(false)
         });
       })
-      return p
     },
 
     handleRemove() {

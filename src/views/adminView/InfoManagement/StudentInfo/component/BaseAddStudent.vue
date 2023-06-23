@@ -66,8 +66,8 @@
 
 <script>
 import {mapState} from "vuex";
-import {getMajorList} from "../../../../../axios/adminView/public";
-import {addStudent, getNewStudentId} from "../../../../../axios/adminView/infoManagement/StudentInfo";
+import {getMajorList} from "@/axios/adminView/public";
+import {addStudent, getNewStudentId} from "@/axios/adminView/infoManagement/StudentInfo";
 
 export default {
   name: "BaseAddStudent",
@@ -139,10 +139,8 @@ export default {
       getNewStudentId({
         amount:''
       }).then(res=>{
-        console.log(res)
         let newStudentIdStr = JSON.parse(res.data.data);
         this.StudentFormNew.id = newStudentIdStr['key1']
-        console.log(this.StudentFormNew.id)
       })
     },
 
@@ -155,7 +153,6 @@ export default {
 
     submitStudent(){
       let student = this.StudentFormNew
-      console.log(student)
       addStudent(student).then(res=>{
         let result = res.data
         if (result.resultCode===200){

@@ -1,8 +1,8 @@
 <template>
   <HomeTemplate
-    :title="viewTitle"
-    :user-info="userInfo"
-    :menu="menu"
+      :title="viewTitle"
+      :user-info="userInfo"
+      :menu="menu"
   >
     <template v-slot:left>
       <div class="container">
@@ -19,7 +19,7 @@
             :key="index"
             class="container "
         >
-          <span>{{item.label}}</span>
+          <span>{{ item.label }}</span>
         </div>
       </div>
     </template>
@@ -32,6 +32,7 @@ import {postStudentInfo} from "@/axios/studentView/homeView";
 import AnnouncementListComponent from "../../../components/AnnouncementListComponent";
 import ClockComponent from "../../../components/Clock";
 import HomeTemplate from "@/components/homeTemplate/index.vue";
+import {StudentRouterEnum, StudentRouterPage} from "@/util/constant/router/student";
 
 export default {
   name: "StudentHome",
@@ -46,7 +47,7 @@ export default {
             {
               label: '自主选择导师',
               isDisabled: false,
-              path: '/chooseInstructor',
+              path: StudentRouterPage[StudentRouterEnum.ChooseInstructor],
             }, {
               label: '查看选择结果',
               isDisabled: true,
@@ -73,15 +74,15 @@ export default {
             {
               label: '开题报告',
               isDisabled: false,
-              path: '/thesisProposal'
+              path: StudentRouterPage[StudentRouterEnum.ThesisProposal]
             }, {
               label: '毕业论文',
               isDisabled: false,
-              path: '/thesisView'
+              path: StudentRouterPage[StudentRouterEnum.ThesisView]
             }, {
               label: '毕业论文最终版',
               isDisabled: false,
-              path: '/student/thesisFinalView'
+              path: StudentRouterPage[StudentRouterEnum.ThesisFinalView]
             }, {
               label: '答辩材料',
               isDisabled: true,

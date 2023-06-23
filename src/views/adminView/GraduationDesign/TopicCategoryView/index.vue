@@ -111,7 +111,7 @@ import {
   addTopicCategory,
   deletedTopicCategory,
   postTopicCategoryPage, updateTopicCategory
-} from "../../../../axios/adminView/GraduationDesignAbout/topicCategory";
+} from "@/axios/adminView/GraduationDesignAbout/topicCategory";
 export default {
   name: "TopicCategory",
   data(){
@@ -199,7 +199,6 @@ export default {
         pageSize
       }).then(res=>{
         let result = res.data
-        console.log(result)
         if (result.resultCode === 200){
           //当前页数
           this.pageInfo.current_page = result.data.current

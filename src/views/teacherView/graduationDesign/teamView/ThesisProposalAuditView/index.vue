@@ -110,9 +110,9 @@ import {
   postSubmitTPAI,
   postThesisProposalAuditVO,
   postThesisProposalInputSettingList, postTPAIList, postVerifyIsAuditByDepartmentHead
-} from "../../../../../axios/teacher/GDTeamAbout/ThesisProposalAudit";
-import {download, getFileName} from "../../../../../axios/public/testView";
-import {postAuditStatusCategoryList} from "../../../../../axios/public/AuditStatusCategoryAbout";
+} from "@/axios/teacher/GDTeamAbout/ThesisProposalAudit";
+import {download, getFileName} from "@/axios/public/testView";
+import {postAuditStatusCategoryList} from "@/axios/public/AuditStatusCategoryAbout";
 
 export default {
   name: "ThesisProposalAuditView",
@@ -303,7 +303,6 @@ export default {
 
     submitAudit(item){
       let teacherId = this.user.userId
-      console.log(item)
       if (!(item.auditStatusId!==""&& item.auditStatusId!==null)){
         this.$message({
           type:'warning',

@@ -52,7 +52,6 @@ export default {
           resizable: true,
           showOverflow: true,
           align: 'left',
-          height: "auto",
           columns: this.propCustomTableColumns,
           data: this.propTableData,
           rowConfig: {

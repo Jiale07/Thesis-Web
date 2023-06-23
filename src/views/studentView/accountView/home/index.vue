@@ -89,14 +89,6 @@ export default {
       })()
     }
   },
-
-  created() {
-
-  },
-
-  beforeDestroy() {
-    console.log(123)
-  }
 }
 </script>
 

@@ -26,7 +26,7 @@
                       :on-success="handleAvatarSuccess"
                       :before-upload="beforeAvatarUpload"
                   >
-                    <img v-if="teacherResume.imageUrl" :src="teacherResume.imageUrl" class="avatar">
+                    <img v-if="teacherResume.imageUrl" :src="teacherResume.imageUrl" class="avatar" alt="">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
                 </el-form-item>
@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import {postTeacherResume,postUpdateTeacherResume } from "../../../../axios/public/TeacherResumeAbout";
+import {postTeacherResume,postUpdateTeacherResume } from "@/axios/public/TeacherResumeAbout";
 import {mapState} from "vuex";
 
 export default {
@@ -266,7 +266,6 @@ export default {
     },
 
     handleAvatarSuccess(res) {
-      console.log(res)
       this.teacherResume.imageUrl =res.data;
     },
     beforeAvatarUpload(file) {
@@ -289,7 +288,6 @@ export default {
       }).then(result=>{
         let res = result.data
         if(res.resultCode===200){
-          console.log(res)
           let data = Object.assign({},res.data.teacherResume)
           this.teacherInfo.teacherId = res.data.teacherId
           this.teacherInfo.teacherName = res.data.teacherName

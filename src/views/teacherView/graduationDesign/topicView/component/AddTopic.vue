@@ -30,8 +30,8 @@
 </template>
 
 <script>
-import {addTopic} from "../../../../../axios/teacher/GraduationDesignAbout/TopicView";
-import {getTopicCategoryList} from "../../../../../axios/public/GDTopicCategoyrAbout";
+import {addTopic} from "@/axios/teacher/GraduationDesignAbout/TopicView";
+import {getTopicCategoryList} from "@/axios/public/GDTopicCategoyrAbout";
 import {mapState} from "vuex";
 
 export default {
@@ -58,7 +58,6 @@ export default {
     addTopicFunc(){
       let addFrom = this.form
       addFrom.creatorId = this.user.userId
-      console.log(this.form.description)
       addTopic(this.form).then(res=>{
         let result = res.data
         if (result.resultCode){

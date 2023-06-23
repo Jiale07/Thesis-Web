@@ -1,11 +1,12 @@
 import ChooseInstructor from "../../views/studentView/independentChoice/ChooseInstructorView"
+import {StudentPageName, StudentRouterEnum, StudentRouterName, StudentRouterPage} from "@/util/constant/router/student";
 
 const ChooseInstructorRouter = {
-    path:'/chooseInstructor',
-    name:'ChooseInstructor',
+    path: StudentRouterPage[StudentRouterEnum.ChooseInstructor],
+    name: StudentRouterName[StudentRouterEnum.ChooseInstructor],
     component: ChooseInstructor,
     meta: {
-        title:'毕业设计双向选择',
+        title: StudentPageName[StudentRouterEnum.ChooseInstructor],
         requiresAuth: true,
         role:'3000'
     }

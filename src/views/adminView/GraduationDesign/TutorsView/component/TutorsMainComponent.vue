@@ -70,9 +70,9 @@
 <script>
 import {mapState} from "vuex";
 import BaseQueryComponent from "./BaseQueryComponent";
-import {findAllRoleList} from "../../../../../axios/adminView/RoleManagement/RoleInfo";
-import {findAllCollegeList} from "../../../../../axios/adminView/infoManagement/CollegeInfo";
-import {postQuitTutor, postTutorsPage} from "../../../../../axios/adminView/GraduationDesignAbout/tutorView";
+import {findAllRoleList} from "@/axios/adminView/RoleManagement/RoleInfo";
+import {findAllCollegeList} from "@/axios/adminView/infoManagement/CollegeInfo";
+import {postQuitTutor, postTutorsPage} from "@/axios/adminView/GraduationDesignAbout/tutorView";
 
 export default {
   name: "TutorsMainComponent",
@@ -97,7 +97,6 @@ export default {
     },
 
     handleSelectionChange(val) {
-      console.log(val)
       this.multipleSelection = val;
       let List = []
       val.forEach((value,index,array)=>{
@@ -162,8 +161,7 @@ export default {
           //总条数
           this.pageInfo.total = result.data.total
           //结果集
-          let records = result.data.records
-          this.pageInfo.tableData = records
+          this.pageInfo.tableData = result.data.records
           //最大页数
           this.pageInfo.page_count = result.data.pages
         } else {
@@ -178,7 +176,7 @@ export default {
     },
 
     batchRemove(){
-      console.log("批量删除")
+
     },
 
     quitTutor(teacherId,roleId){

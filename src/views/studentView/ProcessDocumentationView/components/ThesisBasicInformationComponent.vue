@@ -24,7 +24,7 @@
 
 <script>
 
-import {postThesisBasicInformationVO} from "../../../../axios/public/ThesisBasicInformation";
+import {postThesisBasicInformationVO} from "@/axios/public/ThesisBasicInformation";
 
 export default {
   name: "ThesisBasicInformationComponent",

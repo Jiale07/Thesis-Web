@@ -1,72 +1,53 @@
 <template>
-  <div>
-<!--    头部-->
-    <Header
-        :userTitle="userTitle"
-        :userInfo="userInfo"
-    ></Header>
-<!--    主体-->
-    <div>
-      <el-container :style="{height:asideHeight+'px'}">
-        <el-aside width="200px" class="myAside" >
-          <NavLeft></NavLeft>
-        </el-aside>
-        <el-main class="main">
-          <router-view :key="$route.fullPath"></router-view>
-        </el-main>
-      </el-container>
+  <div class="body">
+    <div class="header">
+      <Nav :userInfo="userInfo"></Nav>
+    </div>
+    <div class="main">
+      <NavLeft></NavLeft>
+      <div class="router-box">
+        <router-view :key="$route.fullPath"></router-view>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Header from '../../../components/header/index'
-
 import NavLeft from './component/NavLeft/index'
-import {postAdminInfo} from "../../../axios/adminView/homeView";
+import {postAdminInfo} from "@/axios/adminView/homeView";
 import {mapState} from "vuex";
+import Nav from "@/components/nav/index.vue";
 
 
 export default {
   name: "AdminHome",
-  data(){
-    return{
-      userTitle:'管理员',
-      asideHeight:'',
-      userInfo:{
-        userId:'',
-        username:'AdminName'
+  data() {
+    return {
+      userTitle: '管理员',
+      userInfo: {
+        userId: '',
+        username: 'AdminName'
       }
     }
   },
-  computed:{
-    ...mapState('loginAbout',['user'])
+  computed: {
+    ...mapState('loginAbout', ['user'])
   },
-  components:{
-    Header,
+  components: {
+    Nav,
     NavLeft
   },
-  methods:{
-    postAdminInfo(adminId){
+  methods: {
+    postAdminInfo(adminId) {
       postAdminInfo({
         adminId
-      }).then(result=>{
+      }).then(result => {
         let res = result.data
-        if (res.resultCode === 200){
-          console.log(res)
+        if (res.resultCode === 200) {
           this.userInfo.userId = res.data.id
           this.userInfo.userName = res.data.adminName
         }
       })
-    }
-  },
-  mounted() {
-    //获取窗口高度
-    this.asideHeight = document.documentElement.clientHeight - 60;
-    window.onresize = () => {
-      return (() => {
-        this.asideHeight = document.documentElement.clientHeight - 60;
-      })()
     }
   },
   created() {
@@ -76,17 +57,34 @@ export default {
 </script>
 
 <style scoped lang="less">
-
-.myContainer{
-  position: sticky;
-  top:0px;
+.body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.myAside{
+
+.header {
+
+}
+
+.main {
+  display: flex;
+  flex: 1;
+
+  .router-box {
+    padding: 10px;
+    width: 100%;
+  }
+}
+
+.myContainer {
+  position: sticky;
+  top: 0;
+}
+
+.myAside {
 
   background-color: #a1a1a1;
   width: 200px;
-}
-.main{
-
 }
 </style>

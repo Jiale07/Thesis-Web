@@ -1,15 +1,11 @@
 <template>
-  <div :style="{minHeight:asideHeight+'px'}">
+  <div class="body">
     <div class="myContainer">
-      <div class="myContent headerBox">
-        <el-page-header @back="goBack" content="毕业论文" class="header">
-        </el-page-header>
-      </div>
-
+      <HeaderComponent title="毕业论文"/>
       <div v-if="isHavePermission" class="myContent">
         <div>
           <ThesisBasicInformationComponent
-            :studentId="studentId"
+              :studentId="studentId"
           >
           </ThesisBasicInformationComponent>
         </div>
@@ -22,9 +18,9 @@
             <div>
               <div v-if="!buttonInfo.CanSubmit">
                 <span>审核结果：</span>
-                <span>{{buttonInfo.message}}</span>
+                <span>{{ buttonInfo.message }}</span>
               </div>
-              <el-button v-if="buttonInfo.CanSubmit" type="primary" @click="toThesisSubmitView" >提交论文</el-button>
+              <el-button v-if="buttonInfo.CanSubmit" type="primary" @click="toThesisSubmitView">提交论文</el-button>
             </div>
           </div>
           <el-table
@@ -33,12 +29,10 @@
               stripe
               style="width: 100%">
             <el-table-column
-                type="index"
-                width="50">
-            </el-table-column>
-            <el-table-column
-                prop="fileName"
-                label="论文文件名称">
+                v-for="(item, index) in tableColumn"
+                :key="index"
+                v-bind="item"
+            >
             </el-table-column>
             <el-table-column
                 prop="auditStatusName"
@@ -53,7 +47,7 @@
                 label="提交时间">
             </el-table-column>
             <el-table-column align="right">
-              <template slot-scope="scope" >
+              <template slot-scope="scope">
                 <el-button size="mini" @click="toThesisItemView(scope.row.thesisId)">查看详情</el-button>
               </template>
             </el-table-column>
@@ -92,159 +86,166 @@
 import {
   postFinalAuditResults,
   postThesisSubmitTheRecordVOPage, postVerifyIsCanSubmitOfThesis
-} from "../../../../axios/studentView/processDocumentation/ThesisAbout";
-import ThesisBasicInformationComponent from '../component/ThesisBasicInformationComponent'
+} from "@/axios/studentView/processDocumentation/ThesisAbout";
+import ThesisBasicInformationComponent from '../components/ThesisBasicInformationComponent.vue'
 import {mapState} from "vuex";
+import HeaderComponent from '../components/header.vue'
 
 export default {
   name: "ThesisView",
-  data(){
+  data() {
     return {
-      asideHeight:'',
-      pageInfo:{
+      pageInfo: {
         //当前页数
         current_page: 1,
-        total:100,
+        total: 100,
         //每页显示条目个数
-        page_size:10,
-        pager_Count:8,
+        page_size: 10,
+        pager_Count: 8,
         //最大页数
-        page_count:0,
-        page_sizes:[5, 10, 15, 20],
-        tableData:[{}],
+        page_count: 0,
+        page_sizes: [5, 10, 15, 20],
+        tableData: [{}],
+      },
+      tableColumn: [
+        {
+          type: 'index',
+          width: '50px',
+        }, {
+          prop: 'fileName',
+          label: '论文文件名称',
+        },
+      ],
+
+      studentId: '',
+      tableData: [],
+      emptyText: '',
+
+
+      buttonInfo: {
+        CanSubmit: false,
+        message: ''
       },
 
-      studentId:'',
-      tableData:[],
-      emptyText:'',
-
-
-      buttonInfo:{
-        CanSubmit:false,
-        message:''
-      },
-
-      isHavePermission:false,
-      resultMessage:'',
+      isHavePermission: false,
+      resultMessage: '',
     }
   },
-  computed:{
-    ...mapState('loginAbout',['user'])
+  computed: {
+    ...mapState('loginAbout', ['user'])
   },
-  components:{
+  components: {
+    HeaderComponent,
     ThesisBasicInformationComponent
   },
-  methods:{
-    goBack(){
+  methods: {
+    goBack() {
       this.$router.go(-1)
     },
 
-    handleSizeChange(val){
-      this.postThesisSubmitTheRecordVOPage(this.pageInfo.current_page,val,this.studentId)
+    handleSizeChange(val) {
+      this.postThesisSubmitTheRecordVOPage(this.pageInfo.current_page, val, this.studentId)
     },
-    handleCurrentChange(val){
-      this.postThesisSubmitTheRecordVOPage(val,this.pageInfo.page_size,this.studentId)
+    handleCurrentChange(val) {
+      this.postThesisSubmitTheRecordVOPage(val, this.pageInfo.page_size, this.studentId)
     },
 
-    postThesisSubmitTheRecordVOPage(currentPage,pageSize,studentId){
+    postThesisSubmitTheRecordVOPage(currentPage, pageSize, studentId) {
       postThesisSubmitTheRecordVOPage({
         currentPage,
         pageSize,
         studentId
-      }).then(result=>{
+      }).then(result => {
         let res = result.data
-        if (res.resultCode===200){
+        if (res.resultCode === 200) {
           //当前页数
           this.pageInfo.current_page = res.data.current
           //总条数
           this.pageInfo.total = res.data.total
           //结果集
           let records = res.data.records
-          records.forEach(element=>{
+          records.forEach(element => {
             element.submitTime = this.$dayjs(element.submitTime).format("YYYY-MM-DD hh:mm:ss")
           })
 
           this.pageInfo.tableData = records
           //最大页数
           this.pageInfo.page_count = res.data.pages
-        }else{
+        } else {
           this.emptyText = res.message
         }
       })
     },
 
-    toThesisSubmitView(){
+    toThesisSubmitView() {
       this.$router.push({
-        name:'ThesisSubmitView'
+        name: 'ThesisSubmitView'
       })
     },
 
-    toThesisItemView(thesisId){
+    toThesisItemView(thesisId) {
       this.$router.push({
-        name:'ThesisDetailView',
-        params:{
-          propsThesisId:thesisId
+        name: 'ThesisDetailView',
+        params: {
+          propsThesisId: thesisId
         }
       })
     },
 
-    postFinalAuditResults(studentId){
+    postFinalAuditResults(studentId) {
       postFinalAuditResults({
         studentId
-      }).then(result=>{
+      }).then(result => {
         let res = result.data
-        if(res.resultCode===200){
+        if (res.resultCode === 200) {
           this.buttonInfo.CanSubmit = this.stringToBoolean(res.data.isButtonShow)
           this.buttonInfo.message = res.data.message
         }
       })
     },
 
-    stringToBoolean(str)
-    {
-      switch(str.toLowerCase())
-      {
-        case "true": case "yes": case "1": return true;
-        case "false": case "no": case "0": case null: return false;
-        default: return Boolean(str);
+    stringToBoolean(str) {
+      switch (str.toLowerCase()) {
+        case "true":
+        case "yes":
+        case "1":
+          return true;
+        case "false":
+        case "no":
+        case "0":
+        case null:
+          return false;
+        default:
+          return Boolean(str);
       }
     },
 
-    initialization(studentId){
-      let p = new Promise((resolve,reject)=>{
-        postVerifyIsCanSubmitOfThesis({studentId}).then(result=>{
+    initialization(studentId) {
+      let p = new Promise((resolve, reject) => {
+        postVerifyIsCanSubmitOfThesis({studentId}).then(result => {
           let res = result.data
-          if (res.resultCode===200){
+          if (res.resultCode === 200) {
             resolve()
-          }else if(res.resultCode===204){
+          } else if (res.resultCode === 204) {
             reject(res.message)
-          }else{
+          } else {
             this.$message({
-              type:'error',
-              message:res.message
+              type: 'error',
+              message: res.message
             })
           }
         })
       })
       p.then(value => {
-        this.postThesisSubmitTheRecordVOPage(this.pageInfo.current_page,this.pageInfo.page_size,this.studentId)
+        this.postThesisSubmitTheRecordVOPage(this.pageInfo.current_page, this.pageInfo.page_size, this.studentId)
         this.postFinalAuditResults(this.studentId)
-        setTimeout(()=>{
+        setTimeout(() => {
           this.isHavePermission = true
-        },0)
+        }, 0)
         this.resultMessage = value
-      },error=>{
+      }, error => {
         this.resultMessage = error
       })
-    }
-  },
-  mounted() {
-    //获取窗口高度
-    this.asideHeight = document.documentElement.clientHeight;
-    window.onresize = () => {
-      return (() => {
-        this.asideHeight = document.documentElement.clientHeight;
-      })()
     }
   },
   created() {
@@ -255,7 +256,11 @@ export default {
 </script>
 
 <style scoped lang="less">
-.myContainer{
+.body {
+  min-height: 100vh;
+}
+
+.myContainer {
   margin: 0 auto;
   width: 1280px;
 
@@ -265,17 +270,17 @@ export default {
     padding: 15px 25px;
   }
 
-  .recordTitleBox{
+  .recordTitleBox {
     display: flex;
     justify-content: space-between;
   }
 
-  .headerBox{
+  .headerBox {
     margin-bottom: 10px;
   }
 }
 
-.myPageStyle{
+.myPageStyle {
   padding-top: 10px;
   text-align: center;
 }
