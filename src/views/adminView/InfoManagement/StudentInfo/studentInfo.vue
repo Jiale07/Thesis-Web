@@ -1,15 +1,14 @@
 <template>
   <div class="student-info-management-box container">
     <info-management-header
-      title="学生信息管理页面"
-      :buttonList="headerButtonList"
-      @on-click="handleHeaderClick"
-      @on-refresh="refreshToStudentInfoList"
+        title="学生信息管理页面"
+        :buttonList="headerButtonList"
+        @on-click="handleHeaderClick"
+        @on-refresh="refreshToStudentInfoList"
     ></info-management-header>
     <div class="content-box">
       <info-management-table
           :propLoading="loading"
-          class="table-box"
           :prop-border="'inner'"
           :props-custom-table-columns="customTableColumns"
           :table-data="pageInfo.tableData"
@@ -41,7 +40,7 @@ import InfoManagementHeader from "@/components/admin/infoManagementHeader/index.
 import {
   deletedStudent,
   getStudentInfo,
-  getDefaultRoleList,
+  // getDefaultRoleList,
 } from "@/axios/adminView/infoManagement/StudentInfo";
 import {getCollegeList, getMajorList} from "@/axios/adminView/public";
 import {mapState} from "vuex";
@@ -419,11 +418,11 @@ export default {
     formatDate({cellValue}) {
       return $dayjs(cellValue).format("YYYY-MM-DD HH:mm:ss")
     },
-    getInformation() {
-      getDefaultRoleList({}).then(res => {
-        console.log(res)
-      })
-    },
+    // getInformation() {
+    //   getDefaultRoleList({}).then(res => {
+    //
+    //   })
+    // },
     async handleFilterChange(filterChangeArray, currChangeFilterField) {
       let filterParams = {}
       let columnInfo = this.customTableColumns.find(item => item.field === currChangeFilterField)
@@ -479,7 +478,7 @@ export default {
     handleHeaderClick(key) {
       switch (key) {
         case 'add': {
-          console.log('显示添加窗口')
+          // 显示添加窗口
           break;
         }
       }
@@ -514,15 +513,7 @@ export default {
 
   .content-box {
     padding: 0 10px;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
     flex: 1;
-
-    .table-box {
-      flex: 1;
-      overflow: hidden;
-    }
   }
 
   .footer-box {

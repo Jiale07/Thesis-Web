@@ -57,7 +57,7 @@
 
 <script>
 
-import {deletedTopic, findAllTopicPage} from "../../../../../axios/teacher/GraduationDesignAbout/TopicView";
+import {deletedTopic, findAllTopicPage} from "@/axios/teacher/GraduationDesignAbout/TopicView";
 import {mapState} from "vuex";
 
 export default {
@@ -84,7 +84,6 @@ export default {
   },
   methods: {
     handleEdit(index, row) {
-      console.log(index, row);
       this.$router.push({
         name:'TopicDetails',
         params:{
@@ -93,7 +92,6 @@ export default {
       })
     },
     handleDelete(index, row) {
-      console.log(index, row);
       deletedTopic({
         topicId:row.id
       }).then(res=>{

@@ -33,7 +33,7 @@
 
 <script>
 import {mapState} from "vuex";
-import {postUpdateTPAuditInputSetting} from "../../../../../axios/adminView/WebViewSetting/ThesisProposalSettingView";
+import {postUpdateTPAuditInputSetting} from "@/axios/adminView/WebViewSetting/ThesisProposalSettingView";
 
 export default {
   name: "updateTPAISetting",
@@ -60,7 +60,6 @@ export default {
       this.form.serialNumber = this.row.serialNumber
       this.form.titleName = this.row.titleName
       this.form.roleId = this.row.roleId
-      console.log(this.form)
       this.dialogFormVisible = true
     },
     handleClose(){

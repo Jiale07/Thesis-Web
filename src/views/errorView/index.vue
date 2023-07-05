@@ -43,7 +43,6 @@ export default {
       this.$router.go(-2)
     },
     isLogin(){
-      console.log(this.errorMessage[0].id)
       if (this.token===null){
         this.message.id = this.errorMessage[0].id
         this.message.text = this.errorMessage[0].text

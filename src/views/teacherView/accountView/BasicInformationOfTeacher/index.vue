@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import {posTeacherBasicInformation} from "../../../../axios/teacher/account/accountHomeOfTeacherAbout";
+import {posTeacherBasicInformation} from "@/axios/teacher/account/accountHomeOfTeacherAbout";
 import {mapState} from "vuex";
 
 export default {
@@ -33,7 +33,6 @@ export default {
         let res = result.data
         if (res.resultCode===200){
           this.TeacherBasicInformation = res.data
-          console.log(res.data)
         }
       })
     }

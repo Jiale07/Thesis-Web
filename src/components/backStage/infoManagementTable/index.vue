@@ -1,5 +1,5 @@
 <template>
-  <div class="info-management-table">
+  <div class="info-management-table-box">
     <vxe-grid
         class="vxe-grid-style"
         v-bind="customTableOptions"
@@ -16,6 +16,7 @@
       </template>
     </vxe-grid>
   </div>
+
 </template>
 
 <script>
@@ -41,9 +42,7 @@ export default {
     propBorder: String
   },
   data() {
-    return {
-      // filterValueArray: []
-    }
+    return {}
   },
   components: {
     FilterRadio
@@ -59,7 +58,7 @@ export default {
           resizable: true,
           showOverflow: true,
           align: 'left',
-          height: "auto",
+          // height: "auto",
           columns: this.propsCustomTableColumns,
           data: this.tableData,
           rowConfig: {
@@ -102,25 +101,4 @@ export default {
 </script>
 
 <style scoped lang="less">
-.info-management-table {
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-
-  .vxe-grid-style {
-    flex: 1;
-  }
-}
-
-
-.custom-radio-group {
-
-}
-
-.filterBox {
-  position: absolute;
-  background-color: #ffffff;
-  padding: 16px;
-  border-radius: 10px;
-}
 </style>

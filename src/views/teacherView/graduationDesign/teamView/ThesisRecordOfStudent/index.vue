@@ -56,7 +56,7 @@
 <script>
 import ThesisBasicInformationComponent from "../component/ThesisBasicInformationComponent"
 import {mapState} from "vuex";
-import {postThesisSubmittedRecordList} from "../../../../../axios/teacher/GDTeamAbout/ThesisRecordOfStudentAbout";
+import {postThesisSubmittedRecordList} from "@/axios/teacher/GDTeamAbout/ThesisRecordOfStudentAbout";
 export default {
   name: "ThesisRecordOfStudent",
   props: ['propsStudentId'],
@@ -113,7 +113,6 @@ export default {
             element.submitTime = this.$dayjs(element.submitTime).format("YYYY-MM-DD hh:mm:ss")
           })
           this.pageInfo.tableData = records
-          console.log(this.pageInfo.tableData)
           //最大页数
           this.pageInfo.pageCount = res.data.pages
         }else{

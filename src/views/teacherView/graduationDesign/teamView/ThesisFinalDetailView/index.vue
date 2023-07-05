@@ -49,8 +49,8 @@ import {
   postThesisFinalAccessoryFileInfo,
   thesisFinalInputList,
   thesisFinalInputSettingList
-} from "../../../../../axios/teacher/GDTeamAbout/ThesisFinalDetailAbout";
-import {download, getFileName} from "../../../../../axios/public/testView";
+} from "@/axios/teacher/GDTeamAbout/ThesisFinalDetailAbout";
+import {download, getFileName} from "@/axios/public/testView";
 export default {
   name: "ThesisFinalDetailView",
   props:['studentId'],
@@ -147,7 +147,6 @@ export default {
       this.$store.commit("thesisFinalDetail/setStudentId",this.studentId)
       this.initialization(this.studentId)
     }else{
-      console.log(this.$store.state.thesisFinalDetail.studentId)
       this.initialization(this.$store.state.thesisFinalDetail.studentId)
     }
   },

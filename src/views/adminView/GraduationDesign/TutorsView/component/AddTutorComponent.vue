@@ -70,7 +70,7 @@
 import {
   postBatchJoinTutor, postJoinTutor,
   postNotTutorPage
-} from "../../../../../axios/adminView/GraduationDesignAbout/tutorView";
+} from "@/axios/adminView/GraduationDesignAbout/tutorView";
 
 export default {
   name: "AddTutorComponent",
@@ -110,8 +110,7 @@ export default {
           //总条数
           this.pageInfo.total = res.data.total
           //结果集
-          let records = res.data.records
-          this.pageInfo.tableData = records
+          this.pageInfo.tableData = res.data.records
           //最大页数
           this.pageInfo.page_count = res.data.pages
         }else{
@@ -125,7 +124,6 @@ export default {
     },
 
     handleJoinTutor(teacherId){
-      console.log(teacherId+this.TutorRoleId)
       postJoinTutor({
         teacherId,
         roleId:this.TutorRoleId
@@ -157,7 +155,6 @@ export default {
         teacherIdArray,
         roleId
       }
-      console.log(changesTeacherRoleInfo)
       postBatchJoinTutor(JSON.stringify(changesTeacherRoleInfo)).then(res=>{
         let result = res.data
         if (result.resultCode === 200){

@@ -11,8 +11,6 @@ const service = axios.create({
 
 //请求拦截
 service.interceptors.request.use(function (config){
-    // console.log(config);
-    // console.groupEnd();
     //使用本地登录后保存测token进行访问验证。
     if (sessionStorage.getItem("token")){
         config.headers.token = sessionStorage.getItem('token')
@@ -26,9 +24,6 @@ service.interceptors.request.use(function (config){
 //添加相应拦截器
 service.interceptors.response.use(function (response){
     // const res = response.data;
-    // console.log("全局相应拦截")
-    // console.log(response)
-    // console.groupEnd()
     if (response.data.resultCode===401){
         Message.error(response.data.message+"!")
         router.push("/login")

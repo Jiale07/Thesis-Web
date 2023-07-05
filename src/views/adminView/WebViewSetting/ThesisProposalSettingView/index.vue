@@ -46,7 +46,7 @@ import {
   postTPAuditInputSettingList,
   postUpdateTPIS
 
-} from "../../../../axios/adminView/WebViewSetting/ThesisProposalSettingView";
+} from "@/axios/adminView/WebViewSetting/ThesisProposalSettingView";
 import SettingTable from '../../../../components/backStage/settingTable/index'
 import SettingCreateDialog from '../../../../components/backStage/settingCreateDialog'
 import {mapState} from "vuex";
@@ -289,7 +289,6 @@ export default {
         serialNumber: submitFrom.serialNumber,
         titleName: submitFrom.titleName,
       }
-      console.log('params', params)
       postUpdateTPIS(params).then(result=>{
         let res = result.data
         if (res.resultCode){

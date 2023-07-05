@@ -75,10 +75,10 @@ import {
   getThesisInputSettingList,
   postSubmitAuditStatueOfTheThesis, postThesisAccessoryFileInfo, postThesisAuditRecord,
   postThesisInputListByThesisId
-} from "../../../../../axios/teacher/GDTeamAbout/ThesisAuditViewAbout";
-import {postAuditStatusCategoryList} from "../../../../../axios/public/AuditStatusCategoryAbout";
+} from "@/axios/teacher/GDTeamAbout/ThesisAuditViewAbout";
+import {postAuditStatusCategoryList} from "@/axios/public/AuditStatusCategoryAbout";
 import {mapState} from "vuex";
-import {download, getFileName} from "../../../../../axios/public/testView";
+import {download, getFileName} from "@/axios/public/testView";
 
 export default {
   name: "ThesisAuditView",
@@ -183,7 +183,6 @@ export default {
     postThesisAuditRecord(gdThesisId){
       postThesisAuditRecord({gdThesisId}).then(result=>{
         let res = result.data
-        console.log(res)
         if (res.resultCode===200){
           this.ruleForm.id = res.data.id
           this.ruleForm.auditStatusId = res.data.auditStatusId

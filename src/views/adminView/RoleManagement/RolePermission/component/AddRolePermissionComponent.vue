@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import {addRolePermission, getPermission} from "../../../../../axios/adminView/RoleManagement/PermissionInfo";
+import {addRolePermission, getPermission} from "@/axios/adminView/RoleManagement/PermissionInfo";
 import {mapState} from "vuex";
 
 export default {
@@ -55,7 +55,6 @@ export default {
           let roleInfoObject = this.permission
           roleInfoObject.forEach((rpElement)=>{
             list.forEach((listElement,index)=>{
-              // console.log(rpElement.permissionId===listElement.id)
               if (rpElement.permissionId===listElement.id){
                 list.splice(index,1)
               }

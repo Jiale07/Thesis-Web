@@ -84,7 +84,6 @@ export default {
         ],
         password: [
           {validator: validatePassword, trigger: 'blur'},
-          // { required: true, message: '年龄不能为空'},
           {type: 'number', message: '密码必须为数字值'}
         ],
         verifyStatus: [

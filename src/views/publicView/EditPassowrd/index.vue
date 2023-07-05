@@ -61,7 +61,7 @@
 
 <script>
 import EditPasswordResultView from "../EditPasswordResultView"
-import {postCheckOldPassword, postUpdatePassword} from "../../../axios/studentView/account/editPassword";
+import {postCheckOldPassword, postUpdatePassword} from "@/axios/studentView/account/editPassword";
 import {mapState} from "vuex";
 
 export default {
@@ -149,7 +149,6 @@ export default {
             }
           })
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
