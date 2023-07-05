@@ -1,5 +1,5 @@
 <template>
-  <div class="body">
+  <div class="create-custom-form-body">
     <div class="container header">
       <div class="header-left">
         <div @click="handleCallBack">
@@ -407,7 +407,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-.body {
+.create-custom-form-body {
   height: 100%;
   display: flex;
   flex-direction: column;

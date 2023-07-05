@@ -1,5 +1,5 @@
 <template>
-  <div class="body">
+  <div class="custom-form-body">
     <div class="container">
       <div class="button-box">
         <el-button
@@ -138,7 +138,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-.body {
+.custom-form-body {
 
   .button-box {
     margin-bottom: 10px;
