@@ -44,7 +44,7 @@ export default {
   name: "Nav",
   props: {
     menu: {
-      type: [],
+      type: Array,
       default: () => [],
     },
     userInfo: {
