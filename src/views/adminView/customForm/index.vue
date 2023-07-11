@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {getFormList} from "@/axios/customForm";
+import {getFormTemplateList} from "@/axios/customForm";
 
 export default {
   name: "customForm",
@@ -53,7 +53,7 @@ export default {
       buttonList: [
         {
           label: '添加',
-          routerPathName: 'CreateCustomForm',
+          routerPathName: 'CreateCustomFormTemplate',
         },
         {
           label: '表单类型管理',
@@ -78,14 +78,14 @@ export default {
   methods: {
     handleSizeChange(value) {
       this.pageInfo.page_size = value
-      this.getFormList()
+      this.getFormTemplateList()
     },
     handleCurrentChange(value) {
       this.pageInfo.current_page = value
-      this.getFormList()
+      this.getFormTemplateList()
     },
     handleRouterPush(routerPathName) {
-      if (routerPathName === 'CreateCustomForm') {
+      if (routerPathName === 'CreateCustomFormTemplate') {
         this.$selectFormType((data) => {
           this.$router.push({
             name: routerPathName,
@@ -100,12 +100,12 @@ export default {
         })
       }
     },
-    getFormList() {
+    getFormTemplateList() {
       let params = {
         currentPage: this.pageInfo.current_page,
         pageSize: this.pageInfo.page_size
       }
-      getFormList(params).then(res => {
+      getFormTemplateList(params).then(res => {
         const {resultCode, data} = res.data
         if (resultCode === 200) {
           //当前页数
@@ -121,14 +121,14 @@ export default {
     },
     handleCellClick({row}) {
       this.$router.push({
-        name: 'CreateCustomForm',
+        name: 'CreateCustomFormTemplate',
         query: {
-          formId: row.id
+          formTemplateId: row.id
         }
       })
     },
     init() {
-      this.getFormList()
+      this.getFormTemplateList()
     }
   },
   created() {

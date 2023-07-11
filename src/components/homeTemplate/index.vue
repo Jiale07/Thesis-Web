@@ -1,7 +1,7 @@
 <template>
   <div class="body">
     <div height="120px" class="header">
-      <Nav :menu="menu" :userInfo="userInfo"></Nav>
+      <Nav :menu="navMenu" :userInfo="userInfo"></Nav>
     </div>
     <div class="main-box">
       <div class="main">
@@ -43,6 +43,11 @@ export default {
   },
   data() {
     return {}
+  },
+  computed: {
+    navMenu() {
+      return this.menu
+    }
   },
   components: {Nav, Footer},
 }

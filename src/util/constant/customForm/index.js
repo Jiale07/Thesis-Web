@@ -23,6 +23,7 @@ const ConfigComponentKey = {
   Number: 2,
   InputNumber: 3, // 计数器
   Radio: 4,
+  Switch: 5,
 }
 
 const ConfigComponentList = [
@@ -39,7 +40,29 @@ const ConfigComponentList = [
     value: 0,
     isCanEdit: true,
     component: ConfigComponentKey.InputNumber,
-  }
+  }, {
+    key: 'max',
+    label: '最大数',
+    value: 1,
+    valueType: 'number',
+    isCanEdit: true,
+    component: ConfigComponentKey.InputNumber,
+  },
+  {
+    key: 'min',
+    label: '最小数',
+    value: 1,
+    valueType: 'number',
+    isCanEdit: true,
+    component: ConfigComponentKey.InputNumber,
+  },
+  // {
+  //   key: 'isRequired',
+  //   label: '是否必填',
+  //   value: false,
+  //   isCanEdit: true,
+  //   component: ConfigComponentKey.Switch,
+  // }
 ]
 
 const DefaultComponentConfig = {
@@ -57,13 +80,13 @@ const DefaultComponentConfig = {
       value: 'number',
       isCanEdit: false,
     },
-    ...getCCList(['maxlength', 'minlength'])
+    ...getCCList(['max', 'min'])
   ],
   [ComponentKey.RichText]: [],
   [ComponentKey.DateSelect]: [
     {
       key: 'format',
-      value: 'yyyy-DD-mm',
+      value: 'yyyy-MM-dd',
       isCanEdit: false
     }
   ],

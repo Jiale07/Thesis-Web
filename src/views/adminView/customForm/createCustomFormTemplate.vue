@@ -1,16 +1,16 @@
 <template>
-  <div class="create-custom-form-body">
+  <div class="create-custom-form-template-body">
     <div class="container header">
       <div class="header-left">
         <div @click="handleCallBack">
           <i class="el-icon-back"></i>
           <span>返回</span>
         </div>
-        <span class="title">{{ formTitle }}</span>
+        <span class="title">{{ formTemplateTitle }}</span>
       </div>
       <div class="header-right">
-        <el-input v-model="formName" placeholder="请输入表单标题"></el-input>
-        <el-button type="primary" @click="submitForm">提交</el-button>
+        <el-input v-model="formTemplateName" placeholder="请输入表单标题"></el-input>
+        <el-button type="primary" @click="submitFormTemplate">提交</el-button>
       </div>
     </div>
     <div class="container main-box">
@@ -90,7 +90,7 @@
 import {ComponentKey, ComponentList, ComponentName, DefaultComponentConfig} from "@/util/constant/customForm";
 import EditConfig from "@/views/adminView/customForm/components/editConfig.vue";
 import {uuis} from '@/util/uuis'
-import {getFormComplete, postCreateForm, postUpdateForm} from "@/axios/customForm";
+import {getFormTemplateComplete, postCreateFormTemplate, postUpdateFormTemplate} from "@/axios/customForm";
 import {debounce} from "@/util/tool";
 import {v4 as uuidv4} from 'uuid';
 
@@ -101,13 +101,13 @@ const ButtonEventKey = {
   Down: 'down'
 }
 export default {
-  name: "CreateCustomForm",
+  name: "CreateCustomFormTemplate",
   components: {EditConfig},
   data() {
     return {
       previewComponentList: [],
       previewComponentKey: uuis(),
-      configList: [],
+      currConfigList: [],
       configListKey: uuis(),
       currSettingComponentId: '',
       ButtonEventKey,
@@ -127,9 +127,7 @@ export default {
       ],
       labelValue: '',
       currFormType: null,
-
-      formId: null,
-      formName: '',
+      formTemplateName: '',
     }
   },
   computed: {
@@ -137,14 +135,14 @@ export default {
       return ComponentList()
     },
     getConfigList() {
-      return this.configList.filter(item => item.isCanEdit)
+      return this.currConfigList.filter(item => item.isCanEdit)
     },
-    formTitle() {
+    formTemplateTitle() {
       return !this.$isEmpty(this.currFormType) ? `${this.currFormType.name} 类型的自定义表单` : ''
     },
-    getFormId() {
-      const {formId} = this.$route.query
-      return formId
+    getFormTemplateId() {
+      const {formTemplateId} = this.$route.query
+      return formTemplateId
     }
 
   },
@@ -289,12 +287,12 @@ export default {
         return resultObj
       })
       let data = {
-        formName: this.formName,
+        formTemplateName: this.formTemplateName,
         formTypeId: this.currFormType.id,
         componentList,
       }
-      if (!this.$isEmpty(this.getFormId)) {
-        Object.assign(data, {formId: this.getFormId})
+      if (!this.$isEmpty(this.getFormTemplateId)) {
+        Object.assign(data, {formTemplateId: this.getFormTemplateId})
       }
       return data
     },
@@ -306,7 +304,7 @@ export default {
       }
       return true
     },
-    submitForm: debounce(function () {
+    submitFormTemplate: debounce(function () {
       // 校验
       if (!this.submitDataVerify()) {
         return false
@@ -325,10 +323,10 @@ export default {
       })
     }, 300),
     getSubmitFunc() {
-      if (this.$isEmpty(this.getFormId)) {
-        return postCreateForm
+      if (this.$isEmpty(this.getFormTemplateId)) {
+        return postCreateFormTemplate
       } else {
-        return postUpdateForm
+        return postUpdateFormTemplate
       }
     },
 
@@ -337,12 +335,12 @@ export default {
     },
 
     formatFormComplete(data) {
-      const {formName, formTypeId, formTypeName, formComponentList} = data
+      const {formTemplateName, formTypeId, formTypeName, formComponentList} = data
       this.currFormType = {
         id: formTypeId,
         name: formTypeName
       }
-      this.formName = formName
+      this.formTemplateName = formTemplateName
 
       const CKList = Object.entries(ComponentKey)
 
@@ -375,8 +373,8 @@ export default {
             }
           })
     },
-    getFormComplete(formId) {
-      return getFormComplete({formId}).then(res => {
+    getFormTemplateComplete(formTemplateId) {
+      return getFormTemplateComplete({formTemplateId}).then(res => {
         let {resultCode, data} = res.data
         if (resultCode === 200) {
           return data[0]
@@ -385,18 +383,18 @@ export default {
         }
       })
     },
-    async initEditFormInfo(formId) {
-      const formInfo = await this.getFormComplete(formId)
-      if (formInfo) {
-        this.formatFormComplete(formInfo)
+    async initEditFormTemplateInfo(formTemplateId) {
+      const formTemplateComplete = await this.getFormTemplateComplete(formTemplateId)
+      if (formTemplateComplete) {
+        this.formatFormComplete(formTemplateComplete)
       }
     }
   },
 
   created() {
-    if (this.getFormId) {
+    if (this.getFormTemplateId) {
       // 更改
-      this.initEditFormInfo(this.getFormId)
+      this.initEditFormTemplateInfo(this.getFormTemplateId)
     } else {
       // 新建
       const {formType} = this.$route.params
@@ -407,7 +405,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-.create-custom-form-body {
+.create-custom-form-template-body {
   height: 100%;
   display: flex;
   flex-direction: column;

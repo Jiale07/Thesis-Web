@@ -204,9 +204,9 @@ const admin = {
       name: 'CustomForm',
       component: () => import("@/views/adminView/customForm")
     }, {
-      path: '/admin/customForm/create',
-      name: 'CreateCustomForm',
-      component: () => import("@/views/adminView/customForm/createCustomForm.vue")
+      path: '/admin/customFormTemplate/create',
+      name: 'CreateCustomFormTemplate',
+      component: () => import("@/views/adminView/customForm/createCustomFormTemplate.vue")
     }, {
       path: '/admin/customForm/formTypeManage',
       name: 'CustomFormTypeManage',

@@ -33,13 +33,14 @@ import AnnouncementListComponent from "../../../components/AnnouncementListCompo
 import ClockComponent from "../../../components/Clock";
 import HomeTemplate from "@/components/homeTemplate/index.vue";
 import {StudentRouterEnum, StudentRouterPage} from "@/util/constant/router/student";
+import {getFormTemplateListByUser, postVerifyIsCanCreateForm} from "@/axios/customForm";
 
 export default {
   name: "StudentHome",
   data() {
     return {
       viewTitle: '学生',
-      menu: [
+      srcMenu: [
         {
           label: '毕业设计',
           isDisabled: false,
@@ -89,8 +90,9 @@ export default {
               path: ''
             }
           ],
-        }
+        },
       ],
+      menu: null,
       userInfo: {
         userId: '',
         username: 'student',
@@ -112,7 +114,7 @@ export default {
 
   computed: {
     ...mapState('loginAbout', ['user']),
-    ...mapState('studentHome', ['studentInfo'])
+    ...mapState('studentHome', ['studentInfo']),
   },
   methods: {
     postStudentInfo(studentId) {
@@ -127,10 +129,55 @@ export default {
         }
       })
     },
+    async initMenu() {
+      let baseObj = {
+        label: '',
+        isDisabled: false,
+        path: '/customFrom/create',
+      }
+      const customFormMenu = {
+        label: '自定义表单',
+        children: []
+      }
+      return getFormTemplateListByUser().then(res => {
+        const {resultCode, data} = res.data
+        if (resultCode === 200) {
+          customFormMenu.children = data.map(item => {
+            return {
+              ...baseObj,
+              label: item.name,
+              query: {
+                formTemplateId: item.id,
+              },
+              // verifyFunc: this.verifyIsCanCreateForm
+            }
+          })
+          this.menu = [
+            ...this.srcMenu,
+            customFormMenu
+          ]
+        } else {
+          return []
+        }
+      })
+    },
+
+    verifyIsCanCreateForm(menuItem) {
+      return postVerifyIsCanCreateForm({formTemplateId: menuItem.query?.formTemplateId}).then(res => {
+        const {resultCode, message, data} = res.data
+        if (data) {
+          return true
+        } else {
+          resultCode === 200 ? this.$message.warning(message) :this.$message.error(message)
+          return false
+        }
+      })
+    }
   },
-  created() {
+  async created() {
     this.postStudentInfo(this.user.userId)
-  },
+    await this.initMenu()
+  }
 }
 </script>
 <style scoped lang="less">

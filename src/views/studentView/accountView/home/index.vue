@@ -83,6 +83,7 @@ export default {
   mounted() {
     //获取窗口高度
     this.asideHeight = document.documentElement.clientHeight;
+
     window.onresize = () => {
       return (() => {
         this.asideHeight = document.documentElement.clientHeight;

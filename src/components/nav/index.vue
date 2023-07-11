@@ -7,7 +7,7 @@
         :style="{height: '60px'}"
     >
       <el-submenu
-          v-for="(item,key) in navMenu"
+          v-for="(item,key) in menuList"
           :index="item.index"
           :key="key"
           :disabled="item.isDisabled"
@@ -17,7 +17,7 @@
             v-for="(childrenItem,key) in item.children"
             :key="key"
             :index="childrenItem.index"
-            @click="toView(childrenItem.path)"
+            @click="toView(childrenItem)"
             :disabled="childrenItem.isDisabled">
           {{ childrenItem.label }}
         </el-menu-item>
@@ -60,17 +60,29 @@ export default {
   data() {
     return {
       activeIndex: '1',
-      navMenu: []
     }
   },
   computed: {
     username() {
       return this.userInfo.username
+    },
+    menuList() {
+      return this.formatMenu(this.menuFilter(this.$cloneDeep(this.menu || [])))
     }
   },
   methods: {
-    toView(page) {
-      this.$router.push(page)
+    async toView(menuItem) {
+      if (!this.$isEmpty(menuItem.verifyFunc)) {
+        let isCanPush = await menuItem.verifyFunc(menuItem)
+        if (!isCanPush) {
+          return false
+        }
+      }
+      const queryStr = Object.keys(menuItem.query).map(item => {
+        return `${item}=${menuItem.query[item]}`
+      }).join('&')
+      const path = `${menuItem.path}?${queryStr}`
+      this.$router.push(path)
     },
     // 默认没有children或children长度为0，则isDisabled = true， isHide = true，即使配置了isDisabled和isHide，格式话后的结果也是一样
     menuFilter(list) {
@@ -102,9 +114,6 @@ export default {
         }
       })
     },
-    initMenu() {
-      this.navMenu = this.formatMenu(this.menuFilter(this.$cloneDeep(this.menu)))
-    },
 
     handleCommand(command) {
       if (command === 'clickLogout') {
@@ -116,9 +125,6 @@ export default {
       this.$router.push('/login')
     }
   },
-  created() {
-    this.initMenu()
-  }
 }
 </script>
 
