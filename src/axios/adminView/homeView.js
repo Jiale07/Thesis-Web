@@ -1,6 +1,6 @@
 import request from '../index'
 
-const api = "/admin/accountHome"
+const api = "/admin/home"
 
 export function postAdminInfo(params){
     return request({

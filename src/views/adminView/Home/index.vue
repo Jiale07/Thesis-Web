@@ -4,9 +4,11 @@
       <Nav :userInfo="userInfo"></Nav>
     </div>
     <div class="main">
-      <NavLeft></NavLeft>
-      <div class="router-box">
-        <router-view :key="$route.fullPath"></router-view>
+      <div class="main-container">
+        <NavLeft></NavLeft>
+        <div class="router-box">
+          <router-view :key="$route.fullPath"></router-view>
+        </div>
       </div>
     </div>
   </div>
@@ -45,7 +47,7 @@ export default {
         let res = result.data
         if (res.resultCode === 200) {
           this.userInfo.userId = res.data.id
-          this.userInfo.userName = res.data.adminName
+          this.userInfo.username = res.data.adminName
         }
       })
     }
@@ -68,8 +70,14 @@ export default {
 }
 
 .main {
-  display: flex;
   flex: 1;
+  display: flex;
+  justify-content: center;
+
+  .main-container {
+    display: flex;
+    width: 1280px;
+  }
 
   .router-box {
     padding: 10px;

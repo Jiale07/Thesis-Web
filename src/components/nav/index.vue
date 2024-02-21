@@ -118,12 +118,20 @@ export default {
   },
   created() {
     this.initMenu()
+    console.log('userInfo', this.userInfo)
   }
 }
 </script>
 
 <style scoped lang="less">
+.Nav {
+  display: flex;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
 .el-menu-demo {
+  width: 1280px;
   display: flex;
   align-items: center;
 }

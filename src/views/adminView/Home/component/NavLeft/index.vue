@@ -171,7 +171,11 @@ export default {
 
 <style scoped lang="less">
 .nav-left-box {
+  margin: 10px 0;
   min-width: 200px;
-  background-color: #f5f7fa;
+  background-color: #ffffff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 </style>
